@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "570400818094",
+    "firebase_url": "https://project-final-ishorim-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "project-final-ishorim",
+    "storage_bucket": "project-final-ishorim.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570400818094:android:5a4c4877d0743a68d97e3f",
+        "android_client_info": {
+          "package_name": "com.example.projectfinal_alpha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "570400818094-cctp3a0tjhhhpp59n2598v0liqijfkg9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0dst-iPvG7u6MpvPfZRuimKqdBISwZQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "570400818094-cctp3a0tjhhhpp59n2598v0liqijfkg9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
