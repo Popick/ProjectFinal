@@ -10,11 +10,23 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -34,11 +46,14 @@ import java.util.concurrent.CountDownLatch;
 public class student_screen extends AppCompatActivity {
     ImageView iVQrCode;
     TextView tVStatusBtn, name_tv, status_tv;
+    Button requestBtn;
     ValueEventListener usrListener;
     Student currentStudent;
     CountDownLatch done = new CountDownLatch(1);
     ProgressBar loader;
-
+    GoogleSignInClient mGoogleSignInClient;
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +64,21 @@ public class student_screen extends AppCompatActivity {
         status_tv = (TextView) findViewById(R.id.status_tv);
         name_tv = (TextView) findViewById(R.id.name_tv);
         loader = (ProgressBar) findViewById(R.id.progress_loader);
+        requestBtn = (Button) findViewById(R.id.request_btn);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        mAuth = FirebaseAuth.getInstance();
+
     }
 
     protected void onResume() {
         super.onResume();
-        readStudent("214881310");
+        currentUser = mAuth.getCurrentUser();
+        readStudent(currentUser.getUid());
     }
 
     public void qr_visibility_switch(View view) {
@@ -90,7 +115,7 @@ public class student_screen extends AppCompatActivity {
     }
 
     public boolean readStudent(String filterPar) {
-        Query query = refStudents;
+        Query query = refUsers;
         usrListener = new ValueEventListener() {
 
 
@@ -106,9 +131,9 @@ public class student_screen extends AppCompatActivity {
 
 
                 for (DataSnapshot data : dS.getChildren()) {
-                    String str1 = (String) data.getKey();
+                    String uID = (String) data.getKey();
                     Student tempStd = data.getValue(Student.class);
-                    if (tempStd.getID().equals("214881310")){
+                    if (uID.equals(filterPar)){
                         currentStudent = tempStd;
                     }
                 }
@@ -135,10 +160,10 @@ public class student_screen extends AppCompatActivity {
     }
 
 
-    public void writeStudent(){
-        Student me = new Student("Etay Sabag", "214881310", "12","5","Cyber","Physics","None",null,true );
-        refStudents.child(me.getID()).setValue(me);
-    }
+//    public void writeStudent(){
+//        Student me = new Student("Etay Sabag", "214881310", "12","5","Cyber","Physics","None","Student",null,true );
+//        refStudents.child(me.getID()).setValue(me);
+//    }
 
 
 
@@ -147,12 +172,42 @@ public class student_screen extends AppCompatActivity {
         name_tv.setVisibility(View.VISIBLE);
         if(currentStudent.isALLOWED()){
             status_tv.setText("יש אישור");
+            tVStatusBtn.setVisibility(View.VISIBLE);
+            requestBtn.setVisibility(View.GONE);
         }else{
             status_tv.setText("אין אישור");
+            tVStatusBtn.setVisibility(View.GONE);
+            requestBtn.setVisibility(View.VISIBLE);
+
+
         }
         status_tv.setVisibility(View.VISIBLE);
         tVStatusBtn.setVisibility(View.VISIBLE);
         create_qr_code(String.valueOf(currentStudent.isALLOWED()));
 
+    }
+
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return true;
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String st = item.getTitle().toString();
+        if(st.equals("Logout")){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            FirebaseAuth.getInstance().signOut();
+                            Toast.makeText(student_screen.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+        }
+
+        return true;
     }
 }
