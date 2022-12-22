@@ -104,7 +104,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         } else {
             if (studentGrade>9) {
                 if (studentGroupA!=null){
-                    newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", studentGroupA, studentGroupB, null, "Student", null, true);
+                    newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", studentGroupA, studentGroupB, null, "Student", null, false);
                     return true;
                 }
                 else{
@@ -112,7 +112,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
                     return false;
                 }
             }
-            newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", null, null, null, "Student", null, true);
+            newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", null, null, null, "Student", null, false);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             return true;
         }

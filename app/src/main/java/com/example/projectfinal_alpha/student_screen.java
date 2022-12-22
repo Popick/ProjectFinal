@@ -6,6 +6,7 @@ import static com.example.projectfinal_alpha.FBref.refUsers;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -31,11 +33,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -54,6 +61,9 @@ public class student_screen extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference().child("uploads");
+    Intent siRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +75,8 @@ public class student_screen extends AppCompatActivity {
         name_tv = (TextView) findViewById(R.id.name_tv);
         loader = (ProgressBar) findViewById(R.id.progress_loader);
         requestBtn = (Button) findViewById(R.id.request_btn);
+
+        siRequests = new Intent(this, request_screen.class);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -166,6 +178,9 @@ public class student_screen extends AppCompatActivity {
 //    }
 
 
+    public void sendRequest(View view) {
+        startActivity(siRequests);
+    }
 
     public void fillUI(Student currentStudent){
         name_tv.setText("שלום "+currentStudent.getNAME());
@@ -174,16 +189,22 @@ public class student_screen extends AppCompatActivity {
             status_tv.setText("יש אישור");
             tVStatusBtn.setVisibility(View.VISIBLE);
             requestBtn.setVisibility(View.GONE);
+            iVQrCode.setVisibility(View.VISIBLE);
+            create_qr_code(String.valueOf(currentStudent.isALLOWED()));
         }else{
             status_tv.setText("אין אישור");
             tVStatusBtn.setVisibility(View.GONE);
             requestBtn.setVisibility(View.VISIBLE);
+            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".jpg?alt=media").into(iVQrCode);
+//            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".png?alt=media").into(iVQrCode);
 
+
+
+            loader.setVisibility(View.GONE);
 
         }
         status_tv.setVisibility(View.VISIBLE);
-        tVStatusBtn.setVisibility(View.VISIBLE);
-        create_qr_code(String.valueOf(currentStudent.isALLOWED()));
+//        tVStatusBtn.setVisibility(View.VISIBLE);
 
     }
 
@@ -210,4 +231,5 @@ public class student_screen extends AppCompatActivity {
 
         return true;
     }
+
 }

@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <Space
                 android:layout_width="0dp"
@@ -94,7 +94,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:onClick="sendRequest"
-                android:text="בקש אישור" />
+                android:text="בקש אישור"
+                android:visibility="gone" />
 
             <Space
                 android:layout_width="0dp"

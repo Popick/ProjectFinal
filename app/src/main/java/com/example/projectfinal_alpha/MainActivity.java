@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -97,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     public void onStart() {
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+
     }
 
 
@@ -112,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+
     }
 
 
@@ -148,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("Working!", "signInWithCredential:success");
                                     user = mAuth.getCurrentUser();
                                     updateUI(user);
+
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Log.w("Error!", "signInWithCredential:failure", task.getException());
@@ -184,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             // user exists in the database
+
                             String userType = dataSnapshot.child("usertype").getValue(String.class);
                             if (userType != null) {
                                 switch (userType) {
@@ -275,5 +283,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return true;
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String st = item.getTitle().toString();
+        if(st.equals("Logout")){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            FirebaseAuth.getInstance().signOut();
+                            Toast.makeText(MainActivity.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+        }
+
+        return true;
+    }
 
 }
