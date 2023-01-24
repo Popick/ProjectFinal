@@ -30,7 +30,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="7" />
 
         <Space
             android:layout_width="match_parent"
@@ -46,31 +46,86 @@
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="5" />
 
-            <Spinner
-                android:id="@+id/grade_spinner"
+            <RadioGroup
+                android:id="@+id/radio_group"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="30"
-                android:textDirection="rtl" />
+                android:layoutDirection="rtl"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_now"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="6"
+                    android:checked="true"
+                    android:layoutDirection="rtl"
+                    android:onClick="radio_clicked_now"
+                    android:text="עכשיו" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2" />
+
+                <RadioButton
+                    android:id="@+id/radio_specific_day"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:layoutDirection="rtl"
+                    android:onClick="radio_clicked_specific"
+                    android:text="תאריך ספציפי" />
+
+            </RadioGroup>
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="5" />
+                android:layout_weight="9" />
+
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="10" />
+
+            <Spinner
+                android:id="@+id/day_spinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20"
+                android:entries="@array/days"
+                android:layoutDirection="rtl"
+                android:textDirection="rtl" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="30"
-                android:text="יום:"
+                android:layout_weight="20"
+                android:text="יום"
                 android:textAlignment="center" />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="10" />
         </LinearLayout>
 
         <Space
@@ -87,31 +142,28 @@
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="10" />
 
             <Spinner
-                android:id="@+id/class_spinner"
+                android:id="@+id/hour_spinner"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="30"
+                android:layout_weight="20"
+                android:entries="@array/hours"
+                android:layoutDirection="rtl"
                 android:textDirection="rtl" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="5" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="30"
+                android:layout_weight="20"
                 android:text="שעה:"
                 android:textAlignment="center" />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="10" />
         </LinearLayout>
 
         <Space
@@ -120,10 +172,36 @@
             android:layout_weight="5" />
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <CheckBox
+                android:id="@+id/check_repeat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="20"
+                android:layoutDirection="rtl"
+                android:text="חוזר שבועי?"
+                android:textDirection="rtl" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+        </LinearLayout>
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="10" />
 
         <TextView
             android:id="@+id/textView29"
@@ -145,7 +223,7 @@
                 android:layout_weight="1" />
 
             <EditText
-                android:id="@+id/editTextTextMultiLine"
+                android:id="@+id/editText_reason"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="10"
@@ -162,7 +240,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="25" />
+            android:layout_weight="20" />
 
         <LinearLayout
             android:layout_width="match_parent"

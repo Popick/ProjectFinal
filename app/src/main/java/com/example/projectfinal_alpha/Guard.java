@@ -1,30 +1,30 @@
 package com.example.projectfinal_alpha;
 
 public class Guard {
-    private String NAME;
-    private String USERTYPE;
+    private String Name;
+    private String userType;
 
     public Guard() {
     }
 
-    public String getNAME() {
-        return NAME;
+    public Guard(String name, String userType) {
+        Name = name;
+        this.userType = userType;
     }
 
-    public void setNAME(String NAME) {
-        this.NAME = NAME;
+    public String getName() {
+        return Name;
     }
 
-    public String getUSERTYPE() {
-        return USERTYPE;
+    public void setName(String name) {
+        Name = name;
     }
 
-    public void setUSERTYPE(String USERTYPE) {
-        this.USERTYPE = USERTYPE;
+    public String getUserType() {
+        return userType;
     }
 
-    public Guard(String NAME, String USERTYPE) {
-        this.NAME = NAME;
-        this.USERTYPE = USERTYPE;
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 }

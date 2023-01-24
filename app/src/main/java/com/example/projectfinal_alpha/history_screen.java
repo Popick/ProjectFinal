@@ -8,11 +8,9 @@ import static com.example.projectfinal_alpha.FBref.refUsers;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,9 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,15 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 
-/**
- * @author Etay Sabag <itay45520@gmail.com>
- * @version 1.0
- * @since 26/10/2022
- */
-public class teacher_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
-
+public class history_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ImageView pfp;
     TextView name, email, id;
     Button signout;
@@ -68,10 +57,15 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
     ValueEventListener incomingRequestsListener;
     boolean isallowedflipper = true;
 
+    /**
+     * @author Etay Sabag <itay45520@gmail.com>
+     * @version 1.0
+     * @since 29/12/2022
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teacher_screen);
+        setContentView(R.layout.activity_history_screen);
 
         requestsListView = (ListView) findViewById(R.id.requests_list_view);
         requestsListView.setOnItemClickListener(this);
@@ -144,17 +138,12 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                 for (DataSnapshot data : dS.getChildren()) {
                     String str1 = (String) data.getKey();
-                    requestsID.add(0, str1);
                     Log.i("key", str1);
                     Request rqTemp = data.getValue(Request.class);
-                    if (rqTemp.isPending()) {
+                    if (!rqTemp.isPending()) {
+                        requestsID.add(0, str1);
                         rqTemp.setRequestID(str1);
                         requests.add(0, rqTemp);
-//                    try {
-//                         time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
 
                         refUsers.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String stuTempName = "error";
@@ -181,7 +170,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                                 requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
 //                            Collections.reverse(requestsHeadLine);
-                                ArrayAdapter<String> adp = new ArrayAdapter<String>(teacher_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
+                                ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
                                 requestsListView.setAdapter(adp);
                             }
 
@@ -192,6 +181,8 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                             }
 
                         });
+
+
 
                     }
                 }
@@ -224,7 +215,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(teacher_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(history_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     });
@@ -241,7 +232,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
         isallowedflipper = !isallowedflipper;
 
         Request selectedRequest = requests.get(i);
-        Log.d("request","Selected request: " + selectedRequest.getReason());
+        Log.d("request", "Selected request: " + selectedRequest.getReason());
         // Create an AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -254,64 +245,63 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                 .setTitle(students.get(i).getName());
 
         // Set the buttons
-        builder.setNegativeButton("דחה", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked "Deny" button, do something
-                selectedRequest.setApproved(false);
-                selectedRequest.setPending(false);
-                refRequests.child(selectedRequest.getRequestID()).setValue(requests.get(i));
-
-                studentsID.add(selectedRequest.getStuID());
-                Approval stuApproval = new Approval(
-                        Helper.getCurrentDateString(),
-                        currentUser.getDisplayName(),
-                        currentUser.getUid(),
-                        selectedRequest.getDay(), selectedRequest.getHour(),
-                        groupIDs,
-                        studentsID,
-                        selectedRequest.getRequestID());
-
-                DatabaseReference currentApprovalRef = refApprovals.push();
-                currentApprovalRef.setValue(stuApproval);
-                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
-
-            }
-        });
-
-        builder.setPositiveButton("אשר", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked "Call" button, do something
-
-//                refUsers.child(selectedRequest.getStuID()).child("allowed").setValue(selectedRequest.getRequestID());
-                selectedRequest.setApproved(true);
-                selectedRequest.setPending(false);
-                refRequests.child(selectedRequest.getRequestID()).setValue(selectedRequest);
-
-                studentsID.add(selectedRequest.getStuID());
-                Approval stuApproval = new Approval(
-                        Helper.getCurrentDateString(),
-                        currentUser.getDisplayName(),
-                        currentUser.getUid(),
-                        selectedRequest.getDay(), selectedRequest.getHour(),
-                        groupIDs,
-                        studentsID,
-                        selectedRequest.getRequestID());
-
-                DatabaseReference currentApprovalRef = refApprovals.push();
-                currentApprovalRef.setValue(stuApproval);
-                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
-
-
-
-            }
-        });
-
-        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked "Allow" button, do something
-//                refUsers.child(requests.get(i).getStuID()).child("allowed").setValue(false);
-            }
-        });
+//        builder.setNegativeButton("דחה", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                // User clicked "Deny" button, do something
+//                selectedRequest.setApproved(false);
+//                selectedRequest.setPending(false);
+//                refRequests.child(selectedRequest.getRequestID()).setValue(requests.get(i));
+//
+//                studentsID.add(selectedRequest.getStuID());
+//                Approval stuApproval = new Approval(
+//                        Helper.getCurrentDateString(),
+//                        currentUser.getDisplayName(),
+//                        currentUser.getUid(),
+//                        selectedRequest.getDay(), selectedRequest.getHour(),
+//                        groupIDs,
+//                        studentsID,
+//                        selectedRequest.getRequestID());
+//
+//                DatabaseReference currentApprovalRef = refApprovals.push();
+//                currentApprovalRef.setValue(stuApproval);
+//                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
+//
+//            }
+//        });
+//
+//        builder.setPositiveButton("אשר", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                // User clicked "Call" button, do something
+//
+////                refUsers.child(selectedRequest.getStuID()).child("allowed").setValue(selectedRequest.getRequestID());
+//                selectedRequest.setApproved(true);
+//                selectedRequest.setPending(false);
+//                refRequests.child(selectedRequest.getRequestID()).setValue(selectedRequest);
+//
+//                studentsID.add(selectedRequest.getStuID());
+//                Approval stuApproval = new Approval(
+//                        Helper.getCurrentDateString(),
+//                        currentUser.getDisplayName(),
+//                        currentUser.getUid(),
+//                        selectedRequest.getDay(), selectedRequest.getHour(),
+//                        groupIDs,
+//                        studentsID,
+//                        selectedRequest.getRequestID());
+//
+//                DatabaseReference currentApprovalRef = refApprovals.push();
+//                currentApprovalRef.setValue(stuApproval);
+//                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
+//
+//
+//            }
+//        });
+//
+//        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                // User clicked "Allow" button, do something
+////                refUsers.child(requests.get(i).getStuID()).child("allowed").setValue(false);
+//            }
+//        });
 
 
         // Create and show the dialog
@@ -320,14 +310,10 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
 
-    public void go_to_create_approval(View view) {
-        Intent intent = new Intent(teacher_screen.this, approval_create_screen.class);
-        startActivity(intent);
-
+    public void go_back(View view) {
+        finish();
     }
 
-    public void go_to_history(View view) {
-        Intent intent = new Intent(teacher_screen.this, history_screen.class);
-        startActivity(intent);
-    }
+
 }
+

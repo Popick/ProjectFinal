@@ -1,4 +1,22 @@
 <resources>
     <string name="app_name">ProjectFinal - Alpha</string>
     <string name="server_client_id">570400818094-cctp3a0tjhhhpp59n2598v0liqijfkg9.apps.googleusercontent.com</string>
+
+    <string-array name="hours">
+        <item>כל היום</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string-array name="days">
+        <item>ראשון</item>
+        <item>שני</item>
+        <item>שלישי</item>
+        <item>רביעי</item>
+        <item>חמישי</item>
+        <item>שישי</item>
+    </string-array>
 </resources>

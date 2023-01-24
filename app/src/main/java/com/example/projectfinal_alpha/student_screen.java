@@ -1,5 +1,6 @@
 package com.example.projectfinal_alpha;
 
+import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
@@ -42,6 +43,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -64,6 +66,7 @@ public class student_screen extends AppCompatActivity {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference().child("uploads");
     Intent siRequests;
+    boolean isAllowed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,18 +97,17 @@ public class student_screen extends AppCompatActivity {
     }
 
     public void qr_visibility_switch(View view) {
-        if (iVQrCode.getVisibility() == View.VISIBLE){
+        if (iVQrCode.getVisibility() == View.VISIBLE) {
             iVQrCode.setVisibility(View.GONE);
             tVStatusBtn.setText("הצג ברקוד");
-        }
-        else{
+        } else {
             iVQrCode.setVisibility(View.VISIBLE);
             tVStatusBtn.setText("הסתר ברקוד");
 
         }
     }
 
-    public void create_qr_code(String content){
+    public void create_qr_code(String content) {
         QRCodeWriter writer = new QRCodeWriter();
         try {
             BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512);
@@ -145,11 +147,18 @@ public class student_screen extends AppCompatActivity {
                 for (DataSnapshot data : dS.getChildren()) {
                     String uID = (String) data.getKey();
                     Student tempStd = data.getValue(Student.class);
-                    if (uID.equals(filterPar)){
+                    if (uID.equals(filterPar)) {
                         currentStudent = tempStd;
                     }
                 }
+
+                if (currentStudent.getApprovalID() != null) {
+//                    isAllowed = currentStudent.checkApproval();
+                    currentStudent.checkApproval();
+                    Log.d("boolboolean","isallowed? "+isAllowed);
+                }
                 fillUI(currentStudent);
+
             }
 
 
@@ -182,22 +191,30 @@ public class student_screen extends AppCompatActivity {
         startActivity(siRequests);
     }
 
-    public void fillUI(Student currentStudent){
-        name_tv.setText("שלום "+currentStudent.getNAME());
+    public void fillUI(Student currentStudent) {
+        Log.d("diff","the request btn");
+        if (currentStudent.getLastRequest() == null || Helper.isMoreThan30Minutes(currentStudent.getLastRequest())) {
+            requestBtn.setEnabled(true);
+        } else {
+            requestBtn.setEnabled(false);
+        }
+
+
+        name_tv.setText("שלום " + currentStudent.getName());
         name_tv.setVisibility(View.VISIBLE);
-        if(currentStudent.isALLOWED()){
+        Log.d("caman", "bad");
+        if (currentStudent.isAllowed) {
             status_tv.setText("יש אישור");
             tVStatusBtn.setVisibility(View.VISIBLE);
             requestBtn.setVisibility(View.GONE);
             iVQrCode.setVisibility(View.VISIBLE);
-            create_qr_code(String.valueOf(currentStudent.isALLOWED()));
-        }else{
+            create_qr_code(currentUser.getUid());
+        } else {
             status_tv.setText("אין אישור");
             tVStatusBtn.setVisibility(View.GONE);
             requestBtn.setVisibility(View.VISIBLE);
-            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".jpg?alt=media").into(iVQrCode);
+//            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + currentUser.getUid() + ".jpg?alt=media").into(iVQrCode);
 //            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".png?alt=media").into(iVQrCode);
-
 
 
             loader.setVisibility(View.GONE);
@@ -214,15 +231,16 @@ public class student_screen extends AppCompatActivity {
 
         return true;
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         String st = item.getTitle().toString();
-        if(st.equals("Logout")){
+        if (st.equals("Logout")) {
             mGoogleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(student_screen.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(student_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     });

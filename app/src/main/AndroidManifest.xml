@@ -21,6 +21,13 @@
         android:theme="@style/Theme.ProjectFinalAlpha"
         tools:targetApi="31">
         <activity
+            android:name=".history_screen"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".approval_create_screen"
             android:exported="false">
             <meta-data

@@ -1,61 +1,40 @@
 package com.example.projectfinal_alpha;
 
 public class Teacher {
-        private String NAME;
-        private String GRADE;
-        private String CLASS;
-        private String USERTYPE;
-        private String LEVEL;
+        private String name;
+        private String userType;
+        private String level;
 
         public Teacher() {
         }
 
-    public String getNAME() {
-        return NAME;
+    public Teacher(String name, String userType, String level) {
+        this.name = name;
+        this.userType = userType;
+        this.level = level;
     }
 
-    public void setNAME(String NAME) {
-        this.NAME = NAME;
+    public String getName() {
+        return name;
     }
 
-    public String getGRADE() {
-        return GRADE;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setGRADE(String GRADE) {
-        this.GRADE = GRADE;
+    public String getUserType() {
+        return userType;
     }
 
-    public String getCLASS() {
-        return CLASS;
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
-    public void setCLASS(String CLASS) {
-        this.CLASS = CLASS;
+    public String getLevel() {
+        return level;
     }
 
-    public String getUSERTYPE() {
-        return USERTYPE;
+    public void setLevel(String level) {
+        this.level = level;
     }
-
-    public void setUSERTYPE(String USERTYPE) {
-        this.USERTYPE = USERTYPE;
-    }
-
-    public String getLEVEL() {
-        return LEVEL;
-    }
-
-    public void setLEVEL(String LEVEL) {
-        this.LEVEL = LEVEL;
-    }
-
-    public Teacher(String NAME, String GRADE, String CLASS, String USERTYPE, String LEVEL) {
-            this.NAME = NAME;
-            this.GRADE = GRADE;
-            this.CLASS = CLASS;
-            this.USERTYPE = USERTYPE;
-            this.LEVEL = LEVEL;
-        }
-
 }

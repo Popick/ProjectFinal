@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         if (dataSnapshot.exists()) {
                             // user exists in the database
 
-                            String userType = dataSnapshot.child("usertype").getValue(String.class);
+                            String userType = dataSnapshot.child("userType").getValue(String.class);
                             if (userType != null) {
                                 switch (userType) {
                                     case "Student":
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (i == 0) {
                                         startActivity(siSignUp);
                                     } else if (i == 1) {
-                                        Teacher newuser = new Teacher(currentUser.getDisplayName(), "", "","Teacher","0");
+                                        Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher","0");
                                         refUsers.child(currentUser.getUid()).setValue(newuser);
                                         Toast.makeText(MainActivity.this, "google account is now set as teacher", Toast.LENGTH_SHORT).show();
                                         startActivity(siTeacher);
@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUInull() {
-        tvtest.setText("error null");
+        Toast.makeText(MainActivity.this,"Error occurred, please contact admin", Toast.LENGTH_SHORT).show();
     }
 
 

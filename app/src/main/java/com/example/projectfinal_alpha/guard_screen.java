@@ -1,5 +1,7 @@
 package com.example.projectfinal_alpha;
 
+import static com.example.projectfinal_alpha.FBref.refUsers;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -8,9 +10,12 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,9 +29,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.Result;
+import com.squareup.picasso.Picasso;
 
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -42,7 +52,8 @@ public class guard_screen extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-
+    ImageView iVQrCode;
+    String approvalID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +65,8 @@ public class guard_screen extends AppCompatActivity {
         scannerView = findViewById(R.id.scanner_view);
         tv_result =findViewById(R.id.tv_result);
         tv_datetime =findViewById(R.id.tv_view_time);
+        iVQrCode = (ImageView) findViewById(R.id.iVQrCode);
+
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -72,8 +85,8 @@ public class guard_screen extends AppCompatActivity {
                         Format dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         String dateTimeString  = dateFormat.format(new Date());
                         Toast.makeText(guard_screen.this, result.getText(), Toast.LENGTH_SHORT).show();
-                        tv_result.setText(result.getText());
                         tv_datetime.setText(dateTimeString);
+                        loadUser(result.getText());
                     }
                 });
             }
@@ -85,6 +98,42 @@ public class guard_screen extends AppCompatActivity {
                 codeScanner.startPreview();
             }
         });
+    }
+
+    public void loadUser(String Uid){
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + Uid + ".jpg?alt=media").into(iVQrCode);
+
+        refUsers.child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value.
+                Student stuTemp = dataSnapshot.getValue(Student.class);
+
+                approvalID = stuTemp.getApprovalID();
+                if(approvalID==null) {
+                    updateApproval(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("failed", "Failed to read value.", error.toException());
+            }
+
+        });
+
+    }
+
+    public void updateApproval(boolean isApproved){
+        if (isApproved){
+            tv_result.setText("יש אישור");
+        }
+        else{
+            tv_result.setText("אין אישור");
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

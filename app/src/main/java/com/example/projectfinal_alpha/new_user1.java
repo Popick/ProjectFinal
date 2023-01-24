@@ -22,6 +22,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+
 /**
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 2.0
@@ -31,22 +33,21 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
     Spinner grade_spinner, class_spinner, groupA_spinner, groupB_spinner;
     String[] grades = {"", "ז", "ח", "ט", "י", "יא", "יב"};
-    int[] gradesnums = {0, 7, 8, 9,10, 11, 12};
+    int[] gradesnums = {0, 7, 8, 9, 10, 11, 12};
     String[] classes = {"", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
     String[] groupA = {"", "פסיכולוגיה", "אומנות", "כימיה", "תקשורת", "מחשבים", "אלקטרוניקה", "הנדסת בניין", "לאי", "מדח", "מחשבת ישראל"};
     String[] groupB = {"", "פיסיקה", "ביוטכנולוגיה", "ביולוגיה"};
     int studentGrade = -1;
     int studentClass = -1;
-    String studentGroupA ;
-    String studentGroupB ;
+    ArrayList<Integer> groups = new ArrayList<Integer>();
+    String studentGroupA;
+    String studentGroupB;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     Intent siNextSignUp;
     ArrayAdapter<String> adp;
     Student newUser;
-
-
 
 
     @Override
@@ -102,17 +103,16 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
             Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
             return false;
         } else {
-            if (studentGrade>9) {
-                if (studentGroupA!=null){
-                    newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", studentGroupA, studentGroupB, null, "Student", null, false);
+            if (studentGrade > 9) {
+                if (studentGroupA != null) {
+                    newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", groups, null, null);
                     return true;
-                }
-                else{
+                } else {
                     Toast.makeText(this, "please select Groups", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
-            newUser = new Student(currentUser.getDisplayName(), studentGrade+"", studentClass+"", null, null, null, "Student", null, false);
+            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", groups, null, null);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -131,7 +131,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
             Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
 
         } else {
-            Teacher newuser = new Teacher(currentUser.getDisplayName(), studentGrade+"", studentClass+"","Teacher","0");
+            Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher", "0");
             refUsers.child(currentUser.getUid()).setValue(newuser);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             finish();
@@ -142,7 +142,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
     public void go_to_new_user2(View view) {
         if (check_input()) {
-            siNextSignUp.putExtra("userObject",newUser);
+            siNextSignUp.putExtra("userObject", newUser);
             startActivity(siNextSignUp);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         }
@@ -159,12 +159,12 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         } else {
             if (adapterView == grade_spinner) {
                 studentGrade = gradesnums[i];
-                if (studentGrade>9){
+                if (studentGrade > 9) {
                     groupA_spinner.setEnabled(true);
                     groupA_spinner.setClickable(true);
                     groupB_spinner.setEnabled(true);
                     groupB_spinner.setClickable(true);
-                }else{
+                } else {
                     groupA_spinner.setEnabled(false);
                     groupA_spinner.setClickable(false);
                     groupB_spinner.setEnabled(false);
@@ -172,9 +172,9 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
                 }
             } else if (adapterView == class_spinner) {
                 studentClass = Integer.parseInt(classes[i]);
-            }else if (adapterView == groupA_spinner) {
+            } else if (adapterView == groupA_spinner) {
                 studentGroupA = groupA[i];
-            }else if (adapterView == groupB_spinner) {
+            } else if (adapterView == groupB_spinner) {
                 studentGroupB = groupB[i];
             }
         }
@@ -192,12 +192,11 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         FirebaseAuth.getInstance().signOut();
-                        Toast.makeText(new_user1.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(new_user1.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
     }
-
 
 
 }

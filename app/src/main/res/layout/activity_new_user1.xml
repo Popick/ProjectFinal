@@ -53,6 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="30"
+                android:layoutDirection="rtl"
                 android:textDirection="rtl" />
 
             <Space
@@ -95,6 +96,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="30"
+                android:layoutDirection="rtl"
                 android:textDirection="rtl" />
 
             <Space
@@ -139,6 +141,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="30"
                 android:clickable="false"
+                android:layoutDirection="rtl"
                 android:textDirection="rtl" />
 
             <Space
@@ -182,6 +185,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="30"
                 android:clickable="false"
+                android:layoutDirection="rtl"
                 android:textDirection="rtl" />
 
             <Space
