@@ -110,41 +110,6 @@ public class Student implements Serializable {
         this.lastRequest = lastRequest;
     }
 
-    public void checkApproval(){
 
-        refApprovals.child(approvalID).addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Approval appTemp = dataSnapshot.getValue(Approval.class);
-                if (appTemp != null) {
-
-                    Log.d("boolboolean",!Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval())+" --> isMoreThan30Minutes");
-                    Log.d("boolboolean",(Helper.getClassNumber(appTemp.getTimeStampApproval()) == Helper.getClassNumber(Helper.getCurrentDateString()))+" --> getClassNumber");
-
-                    isAllowed = (!Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval()) || ((Helper.getClassNumber(appTemp.getTimeStampApproval())
-                            == Helper.getClassNumber(Helper.getCurrentDateString()) && Helper.getClassNumber(Helper.getCurrentDateString()) != -1)));
-
-                } else {
-
-                    isAllowed = false;
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("failed", "Failed to read value.", error.toException());
-                isAllowed = false;
-
-            }
-
-        });
-        Log.d("boolean","is allowed on data change "+ isAllowed);
-
-    }
 
 }

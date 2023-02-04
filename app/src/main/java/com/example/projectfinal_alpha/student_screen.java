@@ -154,10 +154,46 @@ public class student_screen extends AppCompatActivity {
 
                 if (currentStudent.getApprovalID() != null) {
 //                    isAllowed = currentStudent.checkApproval();
-                    currentStudent.checkApproval();
-                    Log.d("boolboolean","isallowed? "+isAllowed);
-                }
-                fillUI(currentStudent);
+                        refApprovals.child(currentStudent.getApprovalID()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                Approval appTemp = dataSnapshot.getValue(Approval.class);
+                                if (appTemp != null) {
+
+                                    Log.d("boolboolean",!Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval())+" --> isMoreThan30Minutes");
+                                    Log.d("boolboolean",(Helper.getClassNumber(appTemp.getTimeStampApproval()) == Helper.getClassNumber(Helper.getCurrentDateString()))+" --> getClassNumber");
+
+                                    isAllowed = (
+                                            !(Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval())) ||
+                                            ((Helper.getClassNumber(appTemp.getTimeStampApproval()) == Helper.getClassNumber(Helper.getCurrentDateString())
+                                                    && Helper.getClassNumber(Helper.getCurrentDateString()) != -1)));
+
+                                    Log.d("caman", isAllowed +" fuck no");
+
+                                } else {
+                                    Log.d("caman", isAllowed +" jkm");
+
+                                    isAllowed = false;
+                                }
+                                Log.d("caman", isAllowed +" !!!");
+                                fillUI(currentStudent);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                // Failed to read value
+                                Log.w("failed", "Failed to read value.", error.toException());
+                                isAllowed = false;
+
+                            }
+
+                        });
+                        Log.d("boolean","is allowed on data change "+ isAllowed);
+
+                    }
 
             }
 
@@ -202,8 +238,8 @@ public class student_screen extends AppCompatActivity {
 
         name_tv.setText("שלום " + currentStudent.getName());
         name_tv.setVisibility(View.VISIBLE);
-        Log.d("caman", "bad");
-        if (currentStudent.isAllowed) {
+        Log.d("caman", isAllowed +"  ???");
+        if (isAllowed) {
             status_tv.setText("יש אישור");
             tVStatusBtn.setVisibility(View.VISIBLE);
             requestBtn.setVisibility(View.GONE);

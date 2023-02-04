@@ -124,7 +124,7 @@ public class Helper {
             long diffInMinutes = diffInMilliseconds / (60 * 1000);
             Log.d("diff",diffInMinutes+" minutes");
             // Return true if the difference is more than 30 minutes
-            return diffInMinutes >= 1;
+            return diffInMinutes >= 5;
 
 
 

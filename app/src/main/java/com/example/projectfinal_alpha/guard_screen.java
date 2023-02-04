@@ -1,5 +1,6 @@
 package com.example.projectfinal_alpha;
 
+import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
@@ -102,6 +103,7 @@ public class guard_screen extends AppCompatActivity {
 
     public void loadUser(String Uid){
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + Uid + ".jpg?alt=media").into(iVQrCode);
+        Log.d("camann", "fuck yes");
 
         refUsers.child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
             
@@ -114,6 +116,41 @@ public class guard_screen extends AppCompatActivity {
                 approvalID = stuTemp.getApprovalID();
                 if(approvalID==null) {
                     updateApproval(false);
+                }else{
+                    refApprovals.child(approvalID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        boolean isAllowed = true;
+
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Approval appTemp = dataSnapshot.getValue(Approval.class);
+                            if (appTemp != null) {
+
+                                Log.d("boolboolean",!Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval())+" --> isMoreThan30Minutes");
+                                Log.d("boolboolean",(Helper.getClassNumber(appTemp.getTimeStampApproval()) == Helper.getClassNumber(Helper.getCurrentDateString()))+" --> getClassNumber");
+
+                                isAllowed = (!Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval()) || ((Helper.getClassNumber(appTemp.getTimeStampApproval())
+                                        == Helper.getClassNumber(Helper.getCurrentDateString()) && Helper.getClassNumber(Helper.getCurrentDateString()) != -1)));
+                                Log.d("camann", isAllowed +" fuck no");
+
+                            } else {
+
+                                isAllowed = false;
+                            }
+
+                            updateApproval(isAllowed);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            // Failed to read value
+                            Log.w("failed", "Failed to read value.", error.toException());
+                            isAllowed = false;
+
+                        }
+
+                    });
+
                 }
             }
 
