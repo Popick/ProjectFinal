@@ -77,7 +77,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
 
     public void send_request(View view) {
 
-
+//TODO: FIX THE NOT TEMP IS TEMP... :( and can send without adding reason to get out
             // Create an AlertDialog builder
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

@@ -67,7 +67,7 @@ public class student_screen extends AppCompatActivity {
     StorageReference storageRef = storage.getReference().child("uploads");
     Intent siRequests;
     boolean isAllowed = false;
-
+//TODO: FIX THE NEED TO RELOAD SCREEN TO UPDATE NOT HEAVING A PERMIT TO GO OUT
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,6 +153,7 @@ public class student_screen extends AppCompatActivity {
                 }
 
                 if (currentStudent.getApprovalID() != null) {
+
 //                    isAllowed = currentStudent.checkApproval();
                         refApprovals.child(currentStudent.getApprovalID()).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -194,6 +195,7 @@ public class student_screen extends AppCompatActivity {
                         Log.d("boolean","is allowed on data change "+ isAllowed);
 
                     }
+                fillUI(currentStudent);
 
             }
 
@@ -239,6 +241,8 @@ public class student_screen extends AppCompatActivity {
         name_tv.setText("שלום " + currentStudent.getName());
         name_tv.setVisibility(View.VISIBLE);
         Log.d("caman", isAllowed +"  ???");
+        loader.setVisibility(View.GONE);
+
         if (isAllowed) {
             status_tv.setText("יש אישור");
             tVStatusBtn.setVisibility(View.VISIBLE);
@@ -253,7 +257,6 @@ public class student_screen extends AppCompatActivity {
 //            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".png?alt=media").into(iVQrCode);
 
 
-            loader.setVisibility(View.GONE);
 
         }
         status_tv.setVisibility(View.VISIBLE);

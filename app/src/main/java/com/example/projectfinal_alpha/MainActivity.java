@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     FirebaseUser user;
     
-
+//TODO: FIX THE SCREEN FOR REGISTERED USERS, OR MAYBE JUST BLOCK ACCESS FROM GOING BACK
     
     
     @Override

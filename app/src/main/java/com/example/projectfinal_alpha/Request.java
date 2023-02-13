@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Request {
-//TODO: UPDATE OBJECT ACCORDING TO THE FIREBASE
+
 
     String stuID;
     String requestID;

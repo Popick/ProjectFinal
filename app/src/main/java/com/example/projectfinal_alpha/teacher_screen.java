@@ -49,7 +49,10 @@ import java.util.Collections;
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.0
  * @since 26/10/2022
+ *
  */
+//TODO: FIX THE LIST NOT UPDATING
+
 public class teacher_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     ImageView pfp;
@@ -328,6 +331,11 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
     public void go_to_history(View view) {
         Intent intent = new Intent(teacher_screen.this, history_screen.class);
+        startActivity(intent);
+    }
+
+    public void go_to_classes(View view) {
+        Intent intent = new Intent(teacher_screen.this, classes_screen.class);
         startActivity(intent);
     }
 }
