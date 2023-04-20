@@ -4,19 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".history_screen" >
+    tools:context=".addto_group_screen">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2" />
+            android:layout_weight="10" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="הוסף אנשים"
+            android:textAlignment="center"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -37,14 +57,13 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/radio_students"
+                    android:id="@+id/radio_now"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="6"
                     android:checked="true"
-                    android:onClick="seeStudents"
                     android:layoutDirection="rtl"
-                    android:text="תלמידים" />
+                    android:text="בחר תלמידים" />
 
                 <Space
                     android:layout_width="0dp"
@@ -52,14 +71,13 @@
                     android:layout_weight="2" />
 
                 <RadioButton
-                    android:id="@+id/radio_groups"
+                    android:id="@+id/radio_specific_day"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="10"
                     android:layoutDirection="rtl"
-                    android:onClick="seeGroups"
-                    android:enabled="true"
-                    android:text="קבוצות" />
+                    android:enabled="false"
+                    android:text="בחר כיתה" />
 
             </RadioGroup>
 
@@ -71,67 +89,70 @@
 
         </LinearLayout>
 
-
-
-
-        <LinearLayout
+        <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="25"
-            android:orientation="horizontal">
+            android:layout_weight="5" />
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2" />
 
-            <ListView
-                android:id="@+id/requests_list_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="50"
-                android:cacheColorHint="#000000">
-
-            </ListView>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/textView29"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="בחר תלמידים:"
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="5" />
+
+        <SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="חפש תלמידים" />
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="50" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:orientation="horizontal">
+            android:layout_weight="10"
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <Space
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="3" />
 
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:onClick="go_back"
-                android:text="חזור" />
+                android:layout_weight="5"
+                android:onClick="add_students"
+                android:text="סיום" />
 
             <Space
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="3" />
         </LinearLayout>
 
-
-
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

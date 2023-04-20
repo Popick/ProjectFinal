@@ -1,6 +1,7 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refStorage;
+import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
@@ -144,8 +145,7 @@ public class new_user2 extends AppCompatActivity {
 
     }
     public void go_to_new_user3(View view) {
-
-        refUsers.child(currentUser.getUid()).setValue(newUser);
+        refStudents.child(currentUser.getUid()).setValue(newUser);
         siNextSignUp.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(siNextSignUp);
     }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".classes_screen">
+    tools:context=".groups_screen">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,6 +33,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="7"
                 android:background="#00F1F8E9"
+                android:clickable="false"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:onClick="filter"
                 android:scaleType="fitCenter"
@@ -67,7 +68,7 @@
                 android:layout_weight="2" />
 
             <ListView
-                android:id="@+id/requests_list_view"
+                android:id="@+id/groups_list_view"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="50"
@@ -108,8 +109,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="30"
-                android:onClick="go_to_create_approval"
-                android:text="צור קבוצה" />
+                android:onClick="go_to_create_group"
+                android:text="סיום" />
 
             <Space
                 android:layout_width="0dp"

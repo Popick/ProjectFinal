@@ -4,23 +4,26 @@ import java.util.ArrayList;
 
 public class Approval {
     String timeStampApproval;
+    String expirationDate;
     String teAnswer;
     String teAnswerID;
     int day;
     ArrayList<Integer> hour;
-    ArrayList<String> studentsIDs;
-    ArrayList<String> groupsIDs;
+    String studentsID;
+    String groupsID;
     String requestID;
 
-    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, ArrayList<String> studentsIDs, ArrayList<String> groupsIDs, String requestID) {
+
+    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, String studentsID, String groupsID, String requestID, String expirationDate) {
         this.timeStampApproval = timeStampApproval;
         this.teAnswer = teAnswer;
         this.teAnswerID = teAnswerID;
         this.day = day;
         this.hour = hour;
-        this.studentsIDs = studentsIDs;
-        this.groupsIDs = groupsIDs;
+        this.studentsID = studentsID;
+        this.groupsID = groupsID;
         this.requestID = requestID;
+        this.expirationDate = expirationDate;
     }
 
     public Approval(){};
@@ -65,20 +68,20 @@ public class Approval {
         this.hour = hour;
     }
 
-    public ArrayList<String> getStudentsIDs() {
-        return studentsIDs;
+    public String getStudentsID() {
+        return studentsID;
     }
 
-    public void setStudentsIDs(ArrayList<String> studentsIDs) {
-        this.studentsIDs = studentsIDs;
+    public void setStudentsID(String studentsID) {
+        this.studentsID = studentsID;
     }
 
-    public ArrayList<String> getGroupsIDs() {
-        return groupsIDs;
+    public String getGroupsID() {
+        return groupsID;
     }
 
-    public void setGroupsIDs(ArrayList<String> groupsIDs) {
-        this.groupsIDs = groupsIDs;
+    public void setGroupsID(String groupsID) {
+        this.groupsID = groupsID;
     }
 
     public String getRequestID() {
@@ -89,5 +92,11 @@ public class Approval {
         this.requestID = requestID;
     }
 
+    public String getExpirationDate() {
+        return expirationDate;
+    }
 
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
+    }
 }

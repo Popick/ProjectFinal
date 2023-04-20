@@ -1,15 +1,5 @@
 package com.example.projectfinal_alpha;
 
-import static com.example.projectfinal_alpha.FBref.refApprovals;
-
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -24,17 +14,21 @@ public class Student implements Serializable {
     private String grade;
     private String aClass;
     private String userType;
-    private ArrayList<Integer> groups;
+    private ArrayList<String> groups;
     private String QR_data;
-    private String approvalID;
+    private ArrayList<String> approvalID;
     private String lastRequest;
+
+    private  ArrayList<String> permanentApprovalID;
+
+
 
     public boolean isAllowed = false;
 
     public Student() {
     }
 
-    public Student(String name, String grade, String aClass, String userType, ArrayList<Integer> groups, String QR_data, String approvalID) {
+    public Student(String name, String grade, String aClass, String userType, ArrayList<String> groups, String QR_data, ArrayList<String> approvalID,  ArrayList<String> permanentApprovalID) {
         this.name = name;
         this.grade = grade;
         this.aClass = aClass;
@@ -42,8 +36,7 @@ public class Student implements Serializable {
         this.groups = groups;
         this.QR_data = QR_data;
         this.approvalID = approvalID;
-
-
+        this.permanentApprovalID = permanentApprovalID;
     }
 
     public String getName() {
@@ -78,13 +71,7 @@ public class Student implements Serializable {
         this.userType = userType;
     }
 
-    public ArrayList<Integer> getGroups() {
-        return groups;
-    }
 
-    public void setGroups(ArrayList<Integer> groups) {
-        this.groups = groups;
-    }
 
     public String getQR_data() {
         return QR_data;
@@ -94,11 +81,11 @@ public class Student implements Serializable {
         this.QR_data = QR_data;
     }
 
-    public String getApprovalID() {
+    public ArrayList<String> getApprovalID() {
         return approvalID;
     }
 
-    public void setApprovalID(String approvalID) {
+    public void setApprovalID(ArrayList<String> approvalID) {
         this.approvalID = approvalID;
     }
 
@@ -110,6 +97,27 @@ public class Student implements Serializable {
         this.lastRequest = lastRequest;
     }
 
+    public ArrayList<String> getGroups() {
+        return groups;
+    }
 
+    public void setGroups(ArrayList<String> groups) {
+        this.groups = groups;
+    }
 
+    public ArrayList<String> getPermanentApprovalID() {
+        return permanentApprovalID;
+    }
+
+    public void setPermanentApprovalID(ArrayList<String> permanentApprovalID) {
+        this.permanentApprovalID = permanentApprovalID;
+    }
+
+    public boolean isAllowed() {
+        return isAllowed;
+    }
+
+    public void setAllowed(boolean allowed) {
+        isAllowed = allowed;
+    }
 }

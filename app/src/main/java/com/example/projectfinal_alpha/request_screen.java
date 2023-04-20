@@ -1,6 +1,7 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refRequests;
+import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,8 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
     CheckBox repeat;
     Boolean isSpecific;
 
+    boolean isTemp = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +79,9 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
     public void send_request(View view) {
+        if (reason.getText().toString().isEmpty()) {
+            reason.setError("אנא ציין סיבה");
+        } else {
 
 //TODO: FIX THE NOT TEMP IS TEMP... :( and can send without adding reason to get out
             // Create an AlertDialog builder
@@ -91,42 +97,41 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
 
                     ArrayList<Integer> hours = new ArrayList<>();
                     String timeNow = Helper.getCurrentDateString();
-
-                    if (reason.getText().toString() == null) {
-                        Toast.makeText(request_screen.this, "Please enter a reason", Toast.LENGTH_LONG);
-                    } else {
-                        Request currentRequest;
-                        if (isSpecific) {
-                            if (selectedHour == 0) {
-                                hours.add(1);
-                                hours.add(2);
-                                hours.add(3);
-                                hours.add(4);
-                                hours.add(5);
-                                hours.add(6);
-                                currentRequest = new Request(currentUser.getUid(),
-                                        timeNow, reason.getText().toString(), false,
-                                        selectedDay, hours, true, false);
-                            } else {
-                                hours.add(selectedHour);
-                                currentRequest = new Request(currentUser.getUid(),
-                                        timeNow, reason.getText().toString(), !repeat.isChecked(),
-                                        selectedDay, hours, true, false);
-                            }
-                        } else {
-                            Calendar calendar = Calendar.getInstance();
-                            hours.add(Helper.getClassNumber(Helper.getCurrentDateString()));
+                    Request currentRequest;
+                    if (isSpecific) {
+                        if (selectedHour == 0) {
+                            hours.add(1);
+                            hours.add(2);
+                            hours.add(3);
+                            hours.add(4);
+                            hours.add(5);
+                            hours.add(6);
                             currentRequest = new Request(currentUser.getUid(),
-                                    timeNow, reason.getText().toString(), false,
-                                    calendar.get(Calendar.DAY_OF_WEEK), hours, true, false);
+                                    timeNow, reason.getText().toString(), isTemp,
+                                    selectedDay, hours, true, false);
+                        } else {
+                            hours.add(selectedHour);
+                            hours.add(selectedHour+1);
+                            currentRequest = new Request(currentUser.getUid(),
+                                    timeNow, reason.getText().toString(), isTemp,
+                                    selectedDay, hours, true, false);
                         }
-                        refRequests.push().setValue(currentRequest);
-                        hours.clear();
+                    } else {
+                        Calendar calendar = Calendar.getInstance();
+                        int currentHour = Helper.getClassNumber(Helper.getCurrentDateString());
+                        hours.add(currentHour);
+                        if (currentHour != 6){hours.add(Helper.getClassNumber(Helper.getCurrentDateString())+1);}
+                        currentRequest = new Request(currentUser.getUid(),
+                                timeNow, reason.getText().toString(), true,
+                                calendar.get(Calendar.DAY_OF_WEEK), hours, true, false);
                     }
+                    refRequests.push().setValue(currentRequest);
+                    hours.clear();
 
-                    refUsers.child(currentUser.getUid()).child("lastRequest").setValue(timeNow);
+                    refStudents.child(currentUser.getUid()).child("lastRequest").setValue(timeNow);
                     Toast.makeText(request_screen.this, "success", Toast.LENGTH_SHORT).show();
                     finish();
+
                 }
             });
 
@@ -141,8 +146,8 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
             AlertDialog dialog = builder.create();
             dialog.show();
 
-
         }
+    }
 
 //
 //
@@ -158,6 +163,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         day.setEnabled(false);
         hour.setEnabled(false);
         repeat.setEnabled(false);
+        repeat.setChecked(false);
     }
 
     public void radio_clicked_specific(View view) {
@@ -165,7 +171,16 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         day.setEnabled(true);
         hour.setEnabled(true);
         repeat.setEnabled(true);
+
+
+    }public void weeklyPressed(View view) {
+        isTemp=!isTemp;
     }
+
+
+
+
+
 
 
     @Override
@@ -174,7 +189,13 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
             selectedDay = i + 1;
         }
         if (adapterView == hour) {
-            selectedHour = i;
+            if (i == 1) {
+                selectedHour = 1;
+            } else if (i == 2) {
+                selectedHour = 3;
+            }else if (i == 3) {
+                selectedHour = 5;
+            }
         }
     }
 

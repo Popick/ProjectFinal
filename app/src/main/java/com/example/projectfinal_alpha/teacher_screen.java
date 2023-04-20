@@ -2,10 +2,12 @@ package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refRequests;
+import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +52,6 @@ import java.util.Collections;
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.0
  * @since 26/10/2022
- *
  */
 //TODO: FIX THE LIST NOT UPDATING
 
@@ -93,23 +95,8 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
-//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-//        if(acct != null)
-//        {
-//            String personName = acct.getDisplayName();
-//            String personGivenName = acct.getGivenName();
-//            String personFamilyName = acct.getFamilyName();
-//            String personEmail = acct.getEmail();
-//            String personId = acct.getId();
-//            Uri personPhoto = acct.getPhotoUrl();
-//            Glide.with(this).load(String.valueOf(personPhoto)).into(pfp);
-//            name.setText(personName);
-//            email.setText(personEmail);
-//            id.setText(personId);
-//
-//
-//
-//        }
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(Html.fromHtml("<font color='#000000'><strong>Teacher</strong></font>"));
     }
 
     public void onStart() {
@@ -117,24 +104,6 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 //        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
         currentUser = mAuth.getCurrentUser();
-        waitForRequest();
-//        Glide.with(this).load(String.valueOf(currentUser.getPhotoUrl())).into(pfp);
-//        name.setText(currentUser.getDisplayName());
-//        email.setText(currentUser.getEmail());
-//        id.setText(currentUser.getUid());
-
-    }
-
-    public void onPause() {
-        super.onPause();
-        if (incomingRequestsListener != null) {
-            refTeachers.removeEventListener(incomingRequestsListener);
-        }
-
-    }
-
-
-    public void waitForRequest() {
         Query query = refRequests;
         incomingRequestsListener = new ValueEventListener() {
             @Override
@@ -159,7 +128,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 //                        e.printStackTrace();
 //                    }
 
-                        refUsers.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        refStudents.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String stuTempName = "error";
                             String stuTempGrade = "error";
                             String stuTempClass = "error";
@@ -167,6 +136,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+                                requestsHeadLine.clear();
                                 // This method is called once with the initial value.
                                 Student stuTemp = dataSnapshot.getValue(Student.class);
                                 stuTempName = stuTemp.getName();
@@ -175,11 +145,8 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                                 stuTempGrade = Helper.getGrade(stuTemp.getGrade());
                                 stuTempClass = stuTemp.getaClass();
 
-                                try {
-                                    time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
+                                time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
+
                                 Log.w("worked", stuTempName);
 
                                 requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
@@ -196,6 +163,8 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                         });
 
+                    } else {
+                        requestsListView.setAdapter(null);
                     }
                 }
 
@@ -209,6 +178,21 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
             }
         };
         query.addValueEventListener(incomingRequestsListener);
+
+
+    }
+
+    public void onPause() {
+        super.onPause();
+        if (incomingRequestsListener != null) {
+            refTeachers.removeEventListener(incomingRequestsListener);
+        }
+
+    }
+
+
+    public void waitForRequest() {
+
 
     }
 
@@ -228,7 +212,9 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
                             Toast.makeText(teacher_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-                            finish();
+                            Intent siMainScreen = new Intent(teacher_screen.this, MainActivity.class);
+                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(siMainScreen);
                         }
                     });
 
@@ -244,18 +230,22 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
         isallowedflipper = !isallowedflipper;
 
         Request selectedRequest = requests.get(i);
-        Log.d("request","Selected request: " + selectedRequest.getReason());
+        Log.d("request", "Selected request: " + selectedRequest.getReason());
         // Create an AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // Set the message and title
-        builder.setMessage
-                        ("סיבת התלמיד: " + "\n" + selectedRequest.getReason() + "\n\n"
-                                + "ליום " + Helper.getDayOfWeekInHebrew(selectedRequest.getDay()) + " בשעה " + selectedRequest.getHour() + "\n" +
-                                "חזרה: " + !selectedRequest.isTemp()
-                        )
-                .setTitle(students.get(i).getName());
+        String bodyString = "סיבת התלמיד: " + "\n" + selectedRequest.getReason() + "\n\n"
+                + "ליום " + Helper.getDayOfWeekInHebrew(selectedRequest.getDay()) + "\n"
+                + "בשעה " + selectedRequest.getHour().toString().substring(1, selectedRequest.getHour().toString().length() - 1) + "\n";
 
+        if (selectedRequest.isTemp()) {
+            bodyString = bodyString + "אישור חד פעמי";
+        } else {
+            bodyString = bodyString + "אישור שבועי";
+        }
+        builder.setMessage(bodyString).setTitle(students.get(i).getName());
+
+        //TODO: delete the request from the database after a new request is requested by the student
         // Set the buttons
         builder.setNegativeButton("דחה", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -264,20 +254,20 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                 selectedRequest.setPending(false);
                 refRequests.child(selectedRequest.getRequestID()).setValue(requests.get(i));
 
-                studentsID.add(selectedRequest.getStuID());
                 Approval stuApproval = new Approval(
                         Helper.getCurrentDateString(),
                         currentUser.getDisplayName(),
                         currentUser.getUid(),
                         selectedRequest.getDay(), selectedRequest.getHour(),
-                        groupIDs,
-                        studentsID,
-                        selectedRequest.getRequestID());
+                        selectedRequest.getStuID(),
+                        null,
+                        selectedRequest.getRequestID(),
+                        null);
 
                 DatabaseReference currentApprovalRef = refApprovals.push();
                 currentApprovalRef.setValue(stuApproval);
-                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
 
+//                refStudents.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
             }
         });
 
@@ -290,26 +280,72 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                 selectedRequest.setPending(false);
                 refRequests.child(selectedRequest.getRequestID()).setValue(selectedRequest);
 
-                studentsID.add(selectedRequest.getStuID());
                 Approval stuApproval = new Approval(
                         Helper.getCurrentDateString(),
                         currentUser.getDisplayName(),
                         currentUser.getUid(),
                         selectedRequest.getDay(), selectedRequest.getHour(),
-                        groupIDs,
-                        studentsID,
-                        selectedRequest.getRequestID());
-
-                DatabaseReference currentApprovalRef = refApprovals.push();
-                currentApprovalRef.setValue(stuApproval);
-                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
+                        selectedRequest.getStuID(),
+                        null,
+                        selectedRequest.getRequestID(),
+                        null);
 
 
+
+                if (selectedRequest.isTemp()) {
+                    stuApproval.setExpirationDate(Helper.getNextWeekDateString());
+                    DatabaseReference currentApprovalRef = refApprovals.push();
+                    currentApprovalRef.setValue(stuApproval);
+                    refStudents.child(selectedRequest.getStuID()).child("approvalID").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<String> currentAppr;
+                            if (dataSnapshot.exists()) {
+                                currentAppr = (ArrayList<String>) dataSnapshot.getValue();
+                            } else {
+                                currentAppr = new ArrayList<String>();
+                            }
+                            currentAppr.add(currentApprovalRef.getKey());
+                            refStudents.child(selectedRequest.getStuID()).child("approvalID").setValue(currentAppr);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors that may occur during the operation
+                        }
+                    });
+                } else {
+                    stuApproval.setExpirationDate(Helper.getNextMonthDateString());
+                    DatabaseReference currentApprovalRef = refApprovals.push();
+                    currentApprovalRef.setValue(stuApproval);
+                    refStudents.child(selectedRequest.getStuID()).child("permanentApprovalID").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                            ArrayList<String> currentPerAppr;
+                            if (dataSnapshot.exists()) {
+                                currentPerAppr = (ArrayList<String>) dataSnapshot.getValue();
+                            } else {
+                                currentPerAppr = new ArrayList<String>();
+                            }
+                            currentPerAppr.add(currentApprovalRef.getKey());
+                            refStudents.child(selectedRequest.getStuID()).child("permanentApprovalID").setValue(currentPerAppr);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors that may occur during the operation
+                        }
+                    });
+//                    refStudents.child(selectedRequest.getStuID()).child("permanentApprovalID").child(tempKey).setValue(currentApprovalRef.getKey());
+                }
 
             }
         });
 
-        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("בטל", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked "Allow" button, do something
 //                refUsers.child(requests.get(i).getStuID()).child("allowed").setValue(false);
@@ -335,7 +371,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
     public void go_to_classes(View view) {
-        Intent intent = new Intent(teacher_screen.this, classes_screen.class);
+        Intent intent = new Intent(teacher_screen.this, groups_screen.class);
         startActivity(intent);
     }
 }

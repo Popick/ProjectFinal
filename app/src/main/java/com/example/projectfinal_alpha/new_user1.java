@@ -1,5 +1,7 @@
 package com.example.projectfinal_alpha;
 
+import static com.example.projectfinal_alpha.FBref.refGuards;
+import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
@@ -39,7 +41,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
     String[] groupB = {"", "פיסיקה", "ביוטכנולוגיה", "ביולוגיה"};
     int studentGrade = -1;
     int studentClass = -1;
-    ArrayList<Integer> groups = new ArrayList<Integer>();
+//    ArrayList<Integer> groups = new ArrayList<Integer>();
     String studentGroupA;
     String studentGroupB;
     GoogleSignInClient mGoogleSignInClient;
@@ -105,14 +107,14 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         } else {
             if (studentGrade > 9) {
                 if (studentGroupA != null) {
-                    newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", groups, null, null);
+                    newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", null, null, null, null);
                     return true;
                 } else {
                     Toast.makeText(this, "please select Groups", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
-            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", groups, null, null);
+            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", null, null, null, null);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -120,7 +122,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
     public void go_to_activity_guard(View view) {
         Guard newuser = new Guard(currentUser.getDisplayName(), "Guard");
-        refUsers.child(currentUser.getUid()).setValue(newuser);
+        refGuards.child(currentUser.getUid()).setValue(newuser);
         Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
         finish();
     }
@@ -132,7 +134,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
         } else {
             Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher", "0");
-            refUsers.child(currentUser.getUid()).setValue(newuser);
+            refTeachers.child(currentUser.getUid()).setValue(newuser);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             finish();
         }

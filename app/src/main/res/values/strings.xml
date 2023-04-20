@@ -1,15 +1,12 @@
 <resources>
-    <string name="app_name">ProjectFinal - Alpha</string>
+    <string name="app_name">Ishurim</string>
     <string name="server_client_id">570400818094-cctp3a0tjhhhpp59n2598v0liqijfkg9.apps.googleusercontent.com</string>
 
     <string-array name="hours">
         <item>כל היום</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
+        <item>1-2</item>
+        <item>3-4</item>
+        <item>5-6</item>
     </string-array>
     <string-array name="days">
         <item>ראשון</item>

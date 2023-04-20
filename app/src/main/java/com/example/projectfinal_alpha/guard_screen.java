@@ -1,6 +1,7 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refApprovals;
+import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,6 +41,7 @@ import com.squareup.picasso.Picasso;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 /**
@@ -54,7 +57,7 @@ public class guard_screen extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     ImageView iVQrCode;
-    String approvalID;
+    ArrayList<String> approvalID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +108,7 @@ public class guard_screen extends AppCompatActivity {
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + Uid + ".jpg?alt=media").into(iVQrCode);
         Log.d("camann", "fuck yes");
 
-        refUsers.child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        refStudents.child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
             
 
             @Override
@@ -117,7 +120,7 @@ public class guard_screen extends AppCompatActivity {
                 if(approvalID==null) {
                     updateApproval(false);
                 }else{
-                    refApprovals.child(approvalID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    refApprovals.child("approvalID").addListenerForSingleValueEvent(new ValueEventListener() {
                         boolean isAllowed = true;
 
                         @Override
@@ -187,7 +190,9 @@ public class guard_screen extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
                             Toast.makeText(guard_screen.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
-                            finish();
+                            Intent siMainScreen = new Intent(guard_screen.this, MainActivity.class);
+                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(siMainScreen);
                         }
                     });
 

@@ -1,6 +1,8 @@
 package com.example.projectfinal_alpha;
 
+import static com.example.projectfinal_alpha.FBref.refGuards;
 import static com.example.projectfinal_alpha.FBref.refStudents;
+import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -54,17 +56,17 @@ import com.google.firebase.messaging.FirebaseMessaging;
 public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
     String[] whichUserType = {"תלמיד", "מורה", "שומר"};
-    Intent siStudent, siGuard, siTeacher, siSignUp, siNotification;
+    Intent siStudent, siGuard, siTeacher, siSignUp;
     TextView tvtest;
     SignInButton signin;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     FirebaseUser user;
-    
+
 //TODO: FIX THE SCREEN FOR REGISTERED USERS, OR MAYBE JUST BLOCK ACCESS FROM GOING BACK
-    
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +75,12 @@ public class MainActivity extends AppCompatActivity {
         siStudent = new Intent(this, student_screen.class);
         siGuard = new Intent(this, guard_screen.class);
         siTeacher = new Intent(this, teacher_screen.class);
+
+        siStudent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        siGuard.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        siTeacher.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         siSignUp = new Intent(this, new_user1.class);
-        siNotification = new Intent(this, notification_screen.class);
 
         tvtest = (TextView) findViewById(R.id.name_tv);
         signin = findViewById(R.id.sign_in_button);
@@ -100,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
     }
 
     public void onStart() {
@@ -111,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
         updateUI(currentUser);
 
     }
-
 
 
     private void signIn() {
@@ -186,60 +190,77 @@ public class MainActivity extends AppCompatActivity {
         if (account != null) {
 //            if (account.getEmail().contains("@bs.amalnet.k12.il") || account.getEmail().contains("@amalnet.k12.il")){
             if (true) {
-                refUsers.child(account.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                refStudents.child(account.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             // user exists in the database
-
-                            String userType = dataSnapshot.child("userType").getValue(String.class);
-                            if (userType != null) {
-                                switch (userType) {
-                                    case "Student":
-                                        startActivity(siStudent);
-                                        break;
-                                    case "Teacher":
-                                        startActivity(siTeacher);
-                                        break;
-                                    case "Guard":
-                                        startActivity(siGuard);
-                                }
-                            }
-
+                            startActivity(siStudent);
 
                         } else {
-                            // user does not exist in the database
-                            AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
-                            adb.setTitle("אנא בחר איזה סוג משתמש אתה רוצה");
-                            adb.setItems(whichUserType, new DialogInterface.OnClickListener() {
-
+                            refTeachers.child(account.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    if (i == 0) {
-                                        startActivity(siSignUp);
-                                    } else if (i == 1) {
-                                        Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher","0");
-                                        refUsers.child(currentUser.getUid()).setValue(newuser);
-                                        Toast.makeText(MainActivity.this, "google account is now set as teacher", Toast.LENGTH_SHORT).show();
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        // user exists in the database
                                         startActivity(siTeacher);
-                                        FirebaseMessaging.getInstance().subscribeToTopic("Teaching")
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        System.out.println("Subscription successful");
-                                                    }
-                                                });
+
                                     } else {
-                                        Guard newuser = new Guard(currentUser.getDisplayName(), "Guard");
-                                        refUsers.child(currentUser.getUid()).setValue(newuser);
-                                        Toast.makeText(MainActivity.this, "google account is now set as guard", Toast.LENGTH_SHORT).show();
-                                        startActivity(siGuard);
+                                        refGuards.child(account.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    // user exists in the database
+                                                    startActivity(siGuard);
+
+                                                } else {
+                                                    // user does not exist in the database
+                                                    AlertDialog.Builder adb=new AlertDialog.Builder(MainActivity.this);
+                                                    adb.setTitle("אנא בחר איזה סוג משתמש אתה רוצה");
+                                                    adb.setItems(whichUserType,new DialogInterface.OnClickListener(){
+
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface,int i){
+                                                            if(i==0){
+                                                                startActivity(siSignUp);
+                                                            }else if(i==1){
+                                                                Teacher newuser=new Teacher(account.getDisplayName(),"Teacher","0");
+                                                                refTeachers.child(account.getUid()).setValue(newuser);
+                                                                Toast.makeText(MainActivity.this,"google account is now set as teacher",Toast.LENGTH_SHORT).show();
+                                                                startActivity(siTeacher);
+                                                                FirebaseMessaging.getInstance().subscribeToTopic("Teaching")
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>(){
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid){
+                                                                                System.out.println("Subscription successful");
+                                                                            }
+                                                                        });
+                                                            }else{
+                                                                Guard newuser = new Guard(account.getDisplayName(),"Guard");
+                                                                refGuards.child(account.getUid()).setValue(newuser);
+                                                                Toast.makeText(MainActivity.this,"google account is now set as guard",Toast.LENGTH_SHORT).show();
+                                                                startActivity(siGuard);
+                                                            }
+                                                        }
+                                                    });
+                                                    AlertDialog ad=adb.create();
+                                                    ad.show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
                                     }
                                 }
-                            });
-                            AlertDialog ad = adb.create();
-                            ad.show();
 
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                         }
                     }
 
@@ -264,16 +285,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUInull() {
-        Toast.makeText(MainActivity.this,"Error occurred, please contact admin", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Error occurred, please contact admin", Toast.LENGTH_SHORT).show();
     }
 
 
     public void go_to_activity_student(View view) {
     }
 
-    public void go_to_activity_notification(View view) {
-        startActivity(siNotification);
-    }
 
     public void go_to_activity_guard(View view) {
     }
@@ -288,15 +306,16 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         String st = item.getTitle().toString();
-        if(st.equals("Logout")){
+        if (st.equals("Logout")) {
             mGoogleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(MainActivity.this,"Signed out successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     });
@@ -307,3 +326,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+
+
+

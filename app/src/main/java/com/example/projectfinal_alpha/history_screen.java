@@ -1,7 +1,9 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refApprovals;
+import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refRequests;
+import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
 
@@ -38,7 +40,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class history_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ImageView pfp;
@@ -47,15 +52,19 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    ArrayList<String> requestsID = new ArrayList<String>();
-    ArrayList<String> studentsID = new ArrayList<String>();
-    ArrayList<String> groupIDs = new ArrayList<String>();
-    ArrayList<String> requestsHeadLine = new ArrayList<String>();
-    ArrayList<Request> requests = new ArrayList<Request>();
-    ArrayList<Student> students = new ArrayList<Student>();
-    ListView requestsListView;
+    ArrayList<String> studentsApprovalsID = new ArrayList<String>();
+    ArrayList<String> studentsApprovalsHeadLine = new ArrayList<String>();
+    ArrayList<Approval> studentsApprovals = new ArrayList<Approval>();
+    ArrayList<String> studentsNames = new ArrayList<String>();
+    ArrayList<String> groupsApprovalsID = new ArrayList<String>();
+    ArrayList<String> groupsApprovalsHeadLine = new ArrayList<String>();
+    ArrayList<Approval> groupsApprovals = new ArrayList<Approval>();
+    ArrayList<String> groupsNames = new ArrayList<String>();
+    long approvalCount = 0;
+    long approvalTotal = 0;
+    ListView approvalsListView;
     ValueEventListener incomingRequestsListener;
-    boolean isallowedflipper = true;
+    boolean isStudentsSelected = true;
 
     /**
      * @author Etay Sabag <itay45520@gmail.com>
@@ -67,8 +76,8 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_screen);
 
-        requestsListView = (ListView) findViewById(R.id.requests_list_view);
-        requestsListView.setOnItemClickListener(this);
+        approvalsListView = (ListView) findViewById(R.id.requests_list_view);
+        approvalsListView.setOnItemClickListener(this);
 //        pfp = (ImageView) findViewById(R.id.pfp);
 //        name = (TextView) findViewById(R.id.name);
 //        email = (TextView) findViewById(R.id.mail);
@@ -126,29 +135,42 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
 
 
     public void waitForRequest() {
-        Query query = refRequests;
+        Query query = refApprovals.orderByChild("timeStampApproval");
+
         incomingRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dS) {
-                requestsID.clear();
-                requests.clear();
-                students.clear();
-                requestsHeadLine.clear();
-
+//                approvalsID.clear();
+//                approvals.clear();
+//                studentsAndGroupsNames.clear();
+//                approvalsHeadLine.clear();
+//                timeArray.clear();
+                studentsApprovalsID.clear();
+                studentsApprovalsHeadLine.clear();
+                studentsApprovals.clear();
+                studentsNames.clear();
+                groupsApprovalsID.clear();
+                groupsApprovalsHeadLine.clear();
+                groupsApprovals.clear();
+                groupsNames.clear();
+                approvalCount = 0;
+                approvalTotal = dS.getChildrenCount();
 
                 for (DataSnapshot data : dS.getChildren()) {
                     String str1 = (String) data.getKey();
                     Log.i("key", str1);
-                    Request rqTemp = data.getValue(Request.class);
-                    if (!rqTemp.isPending()) {
-                        requestsID.add(0, str1);
-                        rqTemp.setRequestID(str1);
-                        requests.add(0, rqTemp);
+                    Approval appTemp = data.getValue(Approval.class);
 
-                        refUsers.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    if (appTemp.getStudentsID() != null) {
+                        studentsApprovalsID.add(0, str1);
+                        studentsApprovals.add(0, appTemp);
+                        Log.i("getStudentsID", appTemp.getStudentsID());
+
+                        refStudents.child(appTemp.getStudentsID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String stuTempName = "error";
                             String stuTempGrade = "error";
                             String stuTempClass = "error";
+                            int stuIndex = 0;
                             String time = "00:00";
 
                             @Override
@@ -156,48 +178,108 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
                                 // This method is called once with the initial value.
                                 Student stuTemp = dataSnapshot.getValue(Student.class);
                                 stuTempName = stuTemp.getName();
-                                students.add(0, stuTemp);
 
                                 stuTempGrade = Helper.getGrade(stuTemp.getGrade());
                                 stuTempClass = stuTemp.getaClass();
 
-                                try {
-                                    time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                Log.w("worked", stuTempName);
+//                                timeArray.add(appTemp.getTimeStampApproval());
+//                                Collections.sort(timeArray, Collections.reverseOrder());
+                                time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
 
-                                requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
-//                            Collections.reverse(requestsHeadLine);
-                                ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
-                                requestsListView.setAdapter(adp);
+
+                                studentsNames.add(0, "התלמיד " + stuTemp.getName());
+                                studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
+                                Log.w("worked", studentsApprovalsHeadLine.get(0));
+                                if (isStudentsSelected) {
+                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+                                    approvalsListView.setAdapter(adp);
+                                }
                             }
 
                             @Override
                             public void onCancelled(DatabaseError error) {
                                 // Failed to read value
                                 Log.w("failed", "Failed to read value.", error.toException());
+
                             }
 
                         });
+                    } else if (appTemp.getGroupsID() != null) {
+                        groupsApprovalsID.add(0, str1);
+                        groupsApprovals.add(0, appTemp);
+                        refGroups.child(appTemp.getGroupsID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            String grpTempName = "error";
+                            String grpTempTeacher = "error";
+                            int grpIndex = 0;
+                            //                            String grpTempClass = "error";
+                            String time = "00:00";
 
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                // This method is called once with the initial value.
+                                Group grpTemp = dataSnapshot.getValue(Group.class);
+                                if (grpTemp != null) {
+                                    grpTempName = grpTemp.getGroupName();
 
+                                    grpTempTeacher = grpTemp.getTeacherName();
+//                                stuTempClass = stuTemp.getaClass();
 
+//                                    timeArray.add(appTemp.getTimeStampApproval());
+//                                    Collections.sort(timeArray, Collections.reverseOrder());
+
+                                    time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
+
+                                    groupsNames.add(0, "הקבוצה " + grpTemp.getGroupName());
+                                    groupsApprovalsHeadLine.add(0, "הקבוצה  " + grpTempName + " - " + grpTempTeacher + "      " + time);
+
+                                } else {
+                                    groupsNames.add(0, "קבוצה נמחקה");
+                                    groupsApprovalsHeadLine.add(0, "הקבוצה נמחקה");
+                                }
+                                if (!isStudentsSelected) {
+                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
+                                    approvalsListView.setAdapter(adp);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                // Failed to read value
+                                Log.w("failed", "Failed to read value.", error.toException());
+
+                            }
+
+                        });
+                    } else {
                     }
-                }
 
+
+                }
 
             }
 
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("in thread", "step 5");
 
             }
         };
         query.addValueEventListener(incomingRequestsListener);
 
+    }
+
+
+    public void seeStudents(View view) {
+        isStudentsSelected = true;
+        ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+        approvalsListView.setAdapter(adp);
+    }
+
+    public void seeGroups(View view) {
+        isStudentsSelected = false;
+        ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
+        approvalsListView.setAdapter(adp);
     }
 
 
@@ -227,86 +309,59 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.d("the item is", "pos:" + i + " the id belongs to " + requestsID.get(i));
+        if (isStudentsSelected) {
+            Log.d("the item is", "pos:" + i + " the id belongs to " + studentsApprovalsID.get(i));
+            Approval selectedApproval = studentsApprovals.get(i);
+            // Create an AlertDialog builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        isallowedflipper = !isallowedflipper;
+            // Set the message and title
+            String bodyString = "מורה מאשר: " + "\n" + selectedApproval.getTeAnswer() + "\n\n"
+                    + "ליום " + Helper.getDayOfWeekInHebrew(selectedApproval.getDay()) + "\n"
+                    + "בשעה " + selectedApproval.getHour().toString().substring(1, selectedApproval.getHour().toString().length() - 1) + "\n";
 
-        Request selectedRequest = requests.get(i);
-        Log.d("request", "Selected request: " + selectedRequest.getReason());
-        // Create an AlertDialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        // Set the message and title
-        builder.setMessage
-                        ("סיבת התלמיד: " + "\n" + selectedRequest.getReason() + "\n\n"
-                                + "ליום " + Helper.getDayOfWeekInHebrew(selectedRequest.getDay()) + " בשעה " + selectedRequest.getHour() + "\n" +
-                                "חזרה: " + !selectedRequest.isTemp()
-                        )
-                .setTitle(students.get(i).getName());
-
-        // Set the buttons
-//        builder.setNegativeButton("דחה", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                // User clicked "Deny" button, do something
-//                selectedRequest.setApproved(false);
-//                selectedRequest.setPending(false);
-//                refRequests.child(selectedRequest.getRequestID()).setValue(requests.get(i));
-//
-//                studentsID.add(selectedRequest.getStuID());
-//                Approval stuApproval = new Approval(
-//                        Helper.getCurrentDateString(),
-//                        currentUser.getDisplayName(),
-//                        currentUser.getUid(),
-//                        selectedRequest.getDay(), selectedRequest.getHour(),
-//                        groupIDs,
-//                        studentsID,
-//                        selectedRequest.getRequestID());
-//
-//                DatabaseReference currentApprovalRef = refApprovals.push();
-//                currentApprovalRef.setValue(stuApproval);
-//                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
-//
-//            }
-//        });
-//
-//        builder.setPositiveButton("אשר", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                // User clicked "Call" button, do something
-//
-////                refUsers.child(selectedRequest.getStuID()).child("allowed").setValue(selectedRequest.getRequestID());
-//                selectedRequest.setApproved(true);
-//                selectedRequest.setPending(false);
-//                refRequests.child(selectedRequest.getRequestID()).setValue(selectedRequest);
-//
-//                studentsID.add(selectedRequest.getStuID());
-//                Approval stuApproval = new Approval(
-//                        Helper.getCurrentDateString(),
-//                        currentUser.getDisplayName(),
-//                        currentUser.getUid(),
-//                        selectedRequest.getDay(), selectedRequest.getHour(),
-//                        groupIDs,
-//                        studentsID,
-//                        selectedRequest.getRequestID());
-//
-//                DatabaseReference currentApprovalRef = refApprovals.push();
-//                currentApprovalRef.setValue(stuApproval);
-//                refUsers.child(selectedRequest.getStuID()).child("approvalID").setValue(currentApprovalRef.getKey());
-//
-//
-//            }
-//        });
-//
-//        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                // User clicked "Allow" button, do something
-////                refUsers.child(requests.get(i).getStuID()).child("allowed").setValue(false);
-//            }
-//        });
+            if (true) {
+                bodyString = bodyString + "אישור חד פעמי\n";
+            } else {
+                bodyString = bodyString + "אישור שבועי\n";
+            }
+            bodyString = bodyString + "אישור ניתן ב " + Helper.stringToDateFull(selectedApproval.getTimeStampApproval());
 
 
-        // Create and show the dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();
+
+            builder.setMessage(bodyString).setTitle(studentsNames.get(i));
+
+            // Create and show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        else{
+            Log.d("the item is", "pos:" + i + " the id belongs to " + groupsApprovalsID.get(i));
+            Approval selectedApproval = groupsApprovals.get(i);
+            // Create an AlertDialog builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set the message and title
+            String bodyString = "מורה מאשר: " + selectedApproval.getTeAnswer() + "\n"
+                    + "ליום " + Helper.getDayOfWeekInHebrew(selectedApproval.getDay()) + "\n"
+                    + "בשעה " + selectedApproval.getHour().toString().substring(1, selectedApproval.getHour().toString().length() - 1) + "\n";
+
+            if (true) {
+                bodyString = bodyString + "אישור חד פעמי\n";
+            } else {
+                bodyString = bodyString + "אישור שבועי\n";
+            }
+            bodyString = bodyString + "אישור ניתן ב " + Helper.stringToDateFull(selectedApproval.getTimeStampApproval());
+
+
+            builder.setMessage(bodyString).setTitle(groupsNames.get(i));
+
+            // Create and show the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+
     }
 
 

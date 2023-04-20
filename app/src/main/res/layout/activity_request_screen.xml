@@ -30,11 +30,6 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_weight="5" />
 
         <LinearLayout
@@ -190,6 +185,7 @@
                 android:layout_weight="20"
                 android:layoutDirection="rtl"
                 android:text="חוזר שבועי?"
+                android:onClick="weeklyPressed"
                 android:textDirection="rtl" />
 
             <Space
@@ -236,11 +232,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
         </LinearLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20" />
 
         <LinearLayout
             android:layout_width="match_parent"
