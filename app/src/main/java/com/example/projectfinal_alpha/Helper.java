@@ -39,6 +39,7 @@ public class Helper {
         c.add(Calendar.MONTH, 1);
         return dateFormat.format(c.getTime());
     }
+
     public static String getNextWeekDateString() {
         // Get the current date and time
         Date date = new Date();
@@ -137,7 +138,7 @@ public class Helper {
         }
     }
 
-    public static int getDayOfWeekNow(){
+    public static int getDayOfWeekNow() {
         Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_WEEK);
     }
@@ -188,18 +189,39 @@ public class Helper {
         }
     }
 
-    public static void addToGroup(String stuID, String groupID){
-        refGroups.child(groupID).child("studentsIDs").addListenerForSingleValueEvent(new ValueEventListener() {
+    public static void addToGroup(String stuID, String groupID, boolean deleteFromWaiting) {
+        refGroups.child(groupID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<String> studentsIDs;
                 if (dataSnapshot.exists()) {
-                    studentsIDs = (ArrayList<String>) dataSnapshot.getValue();
+                    Group tempGroup = dataSnapshot.getValue(Group.class);
+                    ArrayList<String> studentsIDs;
+                    if (tempGroup.getStudentsIDs() != null) {
+                        studentsIDs = tempGroup.getStudentsIDs();
+                    } else {
+                        studentsIDs = new ArrayList<String>();
+                    }
+                    studentsIDs.add(stuID);
+                    tempGroup.setStudentsIDs(studentsIDs);
+
+                    if(deleteFromWaiting) {
+                        ArrayList<String> waitingIDs;
+                        if (tempGroup.getWaitingStudentsIDs() != null) {
+                            waitingIDs = tempGroup.getWaitingStudentsIDs();
+                        } else {
+                            waitingIDs = new ArrayList<String>();
+                        }
+                        waitingIDs.remove(stuID);
+                        tempGroup.setWaitingStudentsIDs(waitingIDs);
+                    }
+
+
+
+                    refGroups.child(groupID).setValue(tempGroup);
+
                 } else {
-                    studentsIDs = new ArrayList<String>();
+
                 }
-                studentsIDs.add(stuID);
-                refGroups.child(groupID).child("studentsIDs").setValue(studentsIDs);
             }
 
             @Override
@@ -226,6 +248,42 @@ public class Helper {
                 // Handle any errors that may occur during the operation
             }
         });
+
+    }
+
+    public static void removeFromGroup(String stuID, String groupID) {
+        refGroups.child(groupID).child("studentsIDs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    ArrayList<String> studentsIDs = (ArrayList<String>) dataSnapshot.getValue();
+                    studentsIDs.remove(stuID);
+                    refGroups.child(groupID).child("studentsIDs").setValue(studentsIDs);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the operation
+            }
+        });
+
+        refStudents.child(stuID).child("groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    ArrayList<String> groups = (ArrayList<String>) dataSnapshot.getValue();
+                    groups.remove(groupID);
+                    refStudents.child(stuID).child("groups").setValue(groups);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the operation
+            }
+        });
+
 
     }
 

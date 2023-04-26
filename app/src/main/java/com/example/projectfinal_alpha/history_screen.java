@@ -10,19 +10,23 @@ import static com.example.projectfinal_alpha.FBref.refUsers;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +49,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class history_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class history_screen extends Fragment implements AdapterView.OnItemClickListener {
     ImageView pfp;
     TextView name, email, id;
     Button signout;
@@ -71,46 +75,93 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
      * @version 1.0
      * @since 29/12/2022
      */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_screen);
 
-        approvalsListView = (ListView) findViewById(R.id.requests_list_view);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_history_screen, container, false);
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        approvalsListView = (ListView) view.findViewById(R.id.requests_list_view);
         approvalsListView.setOnItemClickListener(this);
-//        pfp = (ImageView) findViewById(R.id.pfp);
-//        name = (TextView) findViewById(R.id.name);
-//        email = (TextView) findViewById(R.id.mail);
-//        id = (TextView) findViewById(R.id.id);
-//        signout = (Button) findViewById(R.id.singout);
+
 
         mAuth = FirebaseAuth.getInstance();
-
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
 
 
-//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-//        if(acct != null)
-//        {
-//            String personName = acct.getDisplayName();
-//            String personGivenName = acct.getGivenName();
-//            String personFamilyName = acct.getFamilyName();
-//            String personEmail = acct.getEmail();
-//            String personId = acct.getId();
-//            Uri personPhoto = acct.getPhotoUrl();
-//            Glide.with(this).load(String.valueOf(personPhoto)).into(pfp);
-//            name.setText(personName);
-//            email.setText(personEmail);
-//            id.setText(personId);
-//
-//
-//
-//        }
+        RadioButton radioStudents = view.findViewById(R.id.radio_students);
+        RadioButton radioGroups = view.findViewById(R.id.radio_groups);
+        radioStudents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isStudentsSelected = true;
+                ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+                approvalsListView.setAdapter(adp);
+            }
+        });
+
+        radioGroups.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isStudentsSelected = false;
+                ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
+                approvalsListView.setAdapter(adp);
+            }
+        });
     }
+
+
+
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_history_screen);
+//
+//        approvalsListView = (ListView) findViewById(R.id.requests_list_view);
+//        approvalsListView.setOnItemClickListener(this);
+////        pfp = (ImageView) findViewById(R.id.pfp);
+////        name = (TextView) findViewById(R.id.name);
+////        email = (TextView) findViewById(R.id.mail);
+////        id = (TextView) findViewById(R.id.id);
+////        signout = (Button) findViewById(R.id.singout);
+//
+//        mAuth = FirebaseAuth.getInstance();
+//
+//
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//
+//
+////        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+////        if(acct != null)
+////        {
+////            String personName = acct.getDisplayName();
+////            String personGivenName = acct.getGivenName();
+////            String personFamilyName = acct.getFamilyName();
+////            String personEmail = acct.getEmail();
+////            String personId = acct.getId();
+////            Uri personPhoto = acct.getPhotoUrl();
+////            Glide.with(this).load(String.valueOf(personPhoto)).into(pfp);
+////            name.setText(personName);
+////            email.setText(personEmail);
+////            id.setText(personId);
+////
+////
+////
+////        }
+//    }
 
     public void onStart() {
         super.onStart();
@@ -191,7 +242,7 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
                                 studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
                                 Log.w("worked", studentsApprovalsHeadLine.get(0));
                                 if (isStudentsSelected) {
-                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
                                     approvalsListView.setAdapter(adp);
                                 }
                             }
@@ -237,7 +288,7 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
                                     groupsApprovalsHeadLine.add(0, "הקבוצה נמחקה");
                                 }
                                 if (!isStudentsSelected) {
-                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
+                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
                                     approvalsListView.setAdapter(adp);
                                 }
                             }
@@ -270,42 +321,32 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
 
-    public void seeStudents(View view) {
-        isStudentsSelected = true;
-        ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
-        approvalsListView.setAdapter(adp);
-    }
-
-    public void seeGroups(View view) {
-        isStudentsSelected = false;
-        ArrayAdapter<String> adp = new ArrayAdapter<String>(history_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
-        approvalsListView.setAdapter(adp);
-    }
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
 
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        String st = item.getTitle().toString();
-        if (st.equals("Logout")) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(history_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    });
-
-        }
-
-        return true;
-    }
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main, menu);
+//
+//        return true;
+//    }
+//
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        String st = item.getTitle().toString();
+//        if (st.equals("Logout")) {
+//            mGoogleSignInClient.signOut()
+//                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            FirebaseAuth.getInstance().signOut();
+//                            Toast.makeText(history_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
+//                            finish();
+//                        }
+//                    });
+//
+//        }
+//
+//        return true;
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -313,7 +354,7 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
             Log.d("the item is", "pos:" + i + " the id belongs to " + studentsApprovalsID.get(i));
             Approval selectedApproval = studentsApprovals.get(i);
             // Create an AlertDialog builder
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
             // Set the message and title
             String bodyString = "מורה מאשר: " + "\n" + selectedApproval.getTeAnswer() + "\n\n"
@@ -339,7 +380,7 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
             Log.d("the item is", "pos:" + i + " the id belongs to " + groupsApprovalsID.get(i));
             Approval selectedApproval = groupsApprovals.get(i);
             // Create an AlertDialog builder
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
             // Set the message and title
             String bodyString = "מורה מאשר: " + selectedApproval.getTeAnswer() + "\n"
@@ -365,9 +406,9 @@ public class history_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
 
-    public void go_back(View view) {
-        finish();
-    }
+//    public void go_back(View view) {
+//        finish();
+//    }
 
 
 }

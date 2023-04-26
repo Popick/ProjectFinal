@@ -164,7 +164,7 @@ public class student_screen extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     Approval appTemp = dataSnapshot.getValue(Approval.class);
                                     if (appTemp != null) {
-
+//todo: now that i keep the groups in the user need to update the reading what groups the user in
                                         Log.d("boolean", !Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval()) + " --> isMoreThan30Minutes");
                                         Log.d("boolean", (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString()))) + " --> getClassNumber");
                                         // האישור תקף לחצי שעה

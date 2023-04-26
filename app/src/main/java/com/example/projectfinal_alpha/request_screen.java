@@ -120,7 +120,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
                         Calendar calendar = Calendar.getInstance();
                         int currentHour = Helper.getClassNumber(Helper.getCurrentDateString());
                         hours.add(currentHour);
-                        if (currentHour != 6){hours.add(Helper.getClassNumber(Helper.getCurrentDateString())+1);}
+                        if (currentHour != 6 && currentHour != -1 ){hours.add(Helper.getClassNumber(Helper.getCurrentDateString())+1);}
                         currentRequest = new Request(currentUser.getUid(),
                                 timeNow, reason.getText().toString(), true,
                                 calendar.get(Calendar.DAY_OF_WEEK), hours, true, false);

@@ -3,6 +3,8 @@ package com.example.projectfinal_alpha;
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refRequests;
 import static com.example.projectfinal_alpha.FBref.refStudents;
+import static com.example.projectfinal_alpha.Helper.addToGroup;
+import static com.example.projectfinal_alpha.Helper.removeFromGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,8 +41,8 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
     TextView groupCodeHeader;
     ListView insideLV;
     ListView waitingLV;
-    ArrayList<String> inStudentNames;
-    ArrayList<String> waitStudentNames;
+    ArrayList<String> inStudentNames = new ArrayList<String>();
+    ArrayList<String> waitStudentNames = new ArrayList<String>();;
     Group selectedGroup;
     ValueEventListener incomingRequestsListener;
     
@@ -80,8 +82,8 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
         incomingRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                inStudentNames = new ArrayList<>();
-                waitStudentNames = new ArrayList<>();
+                inStudentNames.clear();
+                waitStudentNames.clear();
 
                 selectedGroup = dataSnapshot.getValue(Group.class);
                 if (selectedGroup != null) {
@@ -198,8 +200,9 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
             builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    selectedGroup.getStudentsIDs().remove(i);
-                    refGroups.child(groupID).child("studentsIDs").setValue(selectedGroup.getStudentsIDs());
+//                    selectedGroup.getStudentsIDs().remove(i);
+                    removeFromGroup(selectedGroup.getStudentsIDs().get(i),groupID);
+//                    refGroups.child(groupID).child("studentsIDs").setValue(selectedGroup.getStudentsIDs());
                     dialog.dismiss();
                 }
             });
@@ -214,12 +217,14 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
             builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (selectedGroup.getStudentsIDs() == null) {
-                        selectedGroup.setStudentsIDs(new ArrayList<String>());
-                    }
-                    selectedGroup.getStudentsIDs().add(selectedGroup.getWaitingStudentsIDs().get(i));
-                    selectedGroup.getWaitingStudentsIDs().remove(i);
-                    refGroups.child(groupID).setValue(selectedGroup);
+//                    if (selectedGroup.getStudentsIDs() == null) {
+//                        selectedGroup.setStudentsIDs(new ArrayList<String>());
+//                    }
+//                    selectedGroup.getStudentsIDs().add(selectedGroup.getWaitingStudentsIDs().get(i));
+                    addToGroup(selectedGroup.getWaitingStudentsIDs().get(i),groupID, true);
+//                    selectedGroup.getWaitingStudentsIDs().remove(i);
+//
+//                    refGroups.child(groupID).setValue(selectedGroup);
                     dialog.dismiss();
                 }
             });

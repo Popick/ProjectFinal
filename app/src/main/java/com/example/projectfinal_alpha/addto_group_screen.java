@@ -2,6 +2,7 @@ package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refStudents;
+import static com.example.projectfinal_alpha.Helper.addToGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -117,15 +118,16 @@ public class addto_group_screen extends AppCompatActivity implements SearchView.
                 AlertDialog.Builder builder = new AlertDialog.Builder(addto_group_screen.this);
                 builder.setTitle("הוסף תלמיד");
                 builder.setMessage("האם אתה רוצה להוסיף את " + parent.getItemAtPosition(position) + " לקבוצה");
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("הוסף", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        allStudentIDs.add(studentIDs.get(studentnames.indexOf(parent.getItemAtPosition(position))));
-                        refGroups.child(groupID).child("studentsIDs").setValue(allStudentIDs);
+//                        allStudentIDs.add(studentIDs.get(studentnames.indexOf(parent.getItemAtPosition(position))));
+                        addToGroup(studentIDs.get(studentnames.indexOf(parent.getItemAtPosition(position))),groupID, false);
+//                        refGroups.child(groupID).child("studentsIDs").setValue(allStudentIDs);
                         searchView.setQuery("", false);
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("בטל", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Cancel code here

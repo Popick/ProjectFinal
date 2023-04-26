@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         siStudent = new Intent(this, student_screen.class);
         siGuard = new Intent(this, guard_screen.class);
-        siTeacher = new Intent(this, teacher_screen.class);
+        siTeacher = new Intent(this, teacher_homescreen.class);
 
         siStudent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         siGuard.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

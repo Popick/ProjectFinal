@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
@@ -18,9 +19,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -55,11 +58,11 @@ import java.util.Collections;
  */
 //TODO: FIX THE LIST NOT UPDATING
 
-public class teacher_screen extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class teacher_screen extends Fragment implements AdapterView.OnItemClickListener {
 
-    ImageView pfp;
-    TextView name, email, id;
-    Button signout;
+
+    TextView noRequestsTV;
+
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
@@ -73,31 +76,52 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
     ValueEventListener incomingRequestsListener;
     boolean isallowedflipper = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teacher_screen);
 
-        requestsListView = (ListView) findViewById(R.id.requests_list_view);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_teacher_screen, container, false);
+        requestsListView = (ListView) rootView.findViewById(R.id.requests_list_view);
         requestsListView.setOnItemClickListener(this);
-//        pfp = (ImageView) findViewById(R.id.pfp);
-//        name = (TextView) findViewById(R.id.name);
-//        email = (TextView) findViewById(R.id.mail);
-//        id = (TextView) findViewById(R.id.id);
-//        signout = (Button) findViewById(R.id.singout);
+
+        noRequestsTV = (TextView) rootView.findViewById(R.id.noRequestsTV);
 
         mAuth = FirebaseAuth.getInstance();
-
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
 
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(Html.fromHtml("<font color='#000000'><strong>Teacher</strong></font>"));
+        return rootView;
     }
+
+
+
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_teacher_screen);
+//
+//        requestsListView = (ListView) findViewById(R.id.requests_list_view);
+//        requestsListView.setOnItemClickListener(this);
+////        pfp = (ImageView) findViewById(R.id.pfp);
+////        name = (TextView) findViewById(R.id.name);
+////        email = (TextView) findViewById(R.id.mail);
+////        id = (TextView) findViewById(R.id.id);
+////        signout = (Button) findViewById(R.id.singout);
+//
+//        mAuth = FirebaseAuth.getInstance();
+//
+//
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
+//
+//
+////        ActionBar actionBar = getSupportActionBar();
+////        actionBar.setTitle(Html.fromHtml("<font color='#000000'><strong>Teacher</strong></font>"));
+//    }
 
     public void onStart() {
         super.onStart();
@@ -127,7 +151,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 //                    } catch (ParseException e) {
 //                        e.printStackTrace();
 //                    }
-
+//todo somehow fix multiple times the same request on data change.
                         refStudents.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String stuTempName = "error";
                             String stuTempGrade = "error";
@@ -136,7 +160,6 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                requestsHeadLine.clear();
                                 // This method is called once with the initial value.
                                 Student stuTemp = dataSnapshot.getValue(Student.class);
                                 stuTempName = stuTemp.getName();
@@ -151,8 +174,14 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                                 requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
 //                            Collections.reverse(requestsHeadLine);
-                                ArrayAdapter<String> adp = new ArrayAdapter<String>(teacher_screen.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
+                                ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
                                 requestsListView.setAdapter(adp);
+                                if (requestsListView.getAdapter() == null) {
+                                    noRequestsTV.setVisibility(View.VISIBLE);
+                                } else {
+                                    noRequestsTV.setVisibility(View.INVISIBLE);
+                                }
+
                             }
 
                             @Override
@@ -165,8 +194,11 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
                     } else {
                         requestsListView.setAdapter(null);
+                        noRequestsTV.setVisibility(View.VISIBLE);
+
                     }
                 }
+
 
 
             }
@@ -198,30 +230,30 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+//        getMenuInflater().inflate(R.menu.main, menu);
 
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        String st = item.getTitle().toString();
-        if (st.equals("Logout")) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(teacher_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-                            Intent siMainScreen = new Intent(teacher_screen.this, MainActivity.class);
-                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(siMainScreen);
-                        }
-                    });
-
-        }
-
-        return true;
-    }
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        String st = item.getTitle().toString();
+//        if (st.equals("Logout")) {
+//            mGoogleSignInClient.signOut()
+//                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            FirebaseAuth.getInstance().signOut();
+//                            Toast.makeText(teacher_homescreen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
+//                            Intent siMainScreen = new Intent(teacher_screen.this, MainActivity.class);
+//                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                            startActivity(siMainScreen);
+//                        }
+//                    });
+//
+//        }
+//
+//        return true;
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -232,7 +264,7 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
         Request selectedRequest = requests.get(i);
         Log.d("request", "Selected request: " + selectedRequest.getReason());
         // Create an AlertDialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         String bodyString = "סיבת התלמיד: " + "\n" + selectedRequest.getReason() + "\n\n"
                 + "ליום " + Helper.getDayOfWeekInHebrew(selectedRequest.getDay()) + "\n"
@@ -289,7 +321,6 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
                         null,
                         selectedRequest.getRequestID(),
                         null);
-
 
 
                 if (selectedRequest.isTemp()) {
@@ -359,19 +390,19 @@ public class teacher_screen extends AppCompatActivity implements AdapterView.OnI
     }
 
 
-    public void go_to_create_approval(View view) {
-        Intent intent = new Intent(teacher_screen.this, approval_create_screen.class);
-        startActivity(intent);
-
-    }
-
-    public void go_to_history(View view) {
-        Intent intent = new Intent(teacher_screen.this, history_screen.class);
-        startActivity(intent);
-    }
-
-    public void go_to_classes(View view) {
-        Intent intent = new Intent(teacher_screen.this, groups_screen.class);
-        startActivity(intent);
-    }
+//    public void go_to_create_approval(View view) {
+////        Intent intent = new Intent(teacher_screen.this, approval_create_screen.class);
+////        startActivity(intent);
+//
+//    }
+//
+//    public void go_to_history(View view) {
+////        Intent intent = new Intent(teacher_screen.this, history_screen.class);
+////        startActivity(intent);
+//    }
+//
+//    public void go_to_classes(View view) {
+////        Intent intent = new Intent(teacher_screen.this, groups_screen.class);
+////        startActivity(intent);
+//    }
 }
