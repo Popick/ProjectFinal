@@ -16,7 +16,7 @@ public class Group {
 
     public Group() {
     }
-
+//bruh what
     public Group(String teacherName, String teacherID, String groupName, String joinCode, boolean canLeave) {
         TeacherName = teacherName;
         this.teacherID = teacherID;
