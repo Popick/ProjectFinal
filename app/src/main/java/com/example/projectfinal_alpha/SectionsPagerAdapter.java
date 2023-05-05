@@ -1,4 +1,4 @@
-package com.example.projectfinal_alpha.ui.main;
+package com.example.projectfinal_alpha;
 
 import android.content.Context;
 
@@ -41,7 +41,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return new teacher_screen();
 
             default:
-                return PlaceholderFragment.newInstance(position + 1);
+                return null;
         }
 
 //        return PlaceholderFragment.newInstance(position + 1);

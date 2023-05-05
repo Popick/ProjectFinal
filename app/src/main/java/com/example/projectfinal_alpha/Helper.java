@@ -97,11 +97,11 @@ public class Helper {
                 return 1;
             } else if (hour == 8 && minute >= 55 || hour == 9 && minute < 45) {
                 return 2;
-            } else if (hour == 10 && minute >= 0 && minute < 50) {
+            } else if ((hour == 10 && minute >= 0 && minute < 50) || (hour == 9 && minute > 45)) {
                 return 3;
             } else if (hour == 10 && minute >= 50 || hour == 11 && minute < 35) {
                 return 4;
-            } else if (hour == 12 && minute >= 0 && minute < 45) {
+            } else if ((hour == 12 && minute >= 0 && minute < 45) || hour == 11 && minute > 35) {
                 return 5;
             } else if (hour == 12 && minute >= 45 || hour == 13 && minute < 30) {
                 return 6;

@@ -20,7 +20,7 @@
             android:id="@+id/groupNameTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="כיתה"
+            android:text="קבוצה"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -34,7 +34,7 @@
             android:id="@+id/groupCodeTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="קוד כיתה: "
+            android:text="קוד קבוצה: "
             android:textSize="18sp"
 
             android:textAlignment="center" />
@@ -75,7 +75,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="תלמידים בכיתה"
+            android:text="תלמידים בקבוצה"
             android:textAlignment="center" />
 
 

@@ -13,7 +13,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -31,7 +30,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.example.projectfinal_alpha.ui.main.SectionsPagerAdapter;
 import com.example.projectfinal_alpha.databinding.ActivityTeacherHomescreenBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -124,6 +122,9 @@ public class teacher_homescreen extends AppCompatActivity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add, menu);
+        MenuItem menuItem = menu.findItem(R.id.joinGroup);
+        menuItem.setTitle("Create Group");
+
 
         return true;
     }
@@ -143,11 +144,12 @@ public class teacher_homescreen extends AppCompatActivity {
                         }
                     });
 
-        } else if (menuTitle.equals("Join Class")) {
+        } else if (menuTitle.equals("Create Group")) {
 
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("הכנס שם לקבוצה");
+            builder.setTitle("צור קבוצה");
+            builder.setMessage("שם הקבוצה:");
 
 // Set up the input
             final EditText input = new EditText(this);
