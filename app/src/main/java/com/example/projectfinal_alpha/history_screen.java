@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -69,6 +71,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     ListView approvalsListView;
     ValueEventListener incomingRequestsListener;
     boolean isStudentsSelected = true;
+    private Query query;
 
     /**
      * @author Etay Sabag <itay45520@gmail.com>
@@ -100,6 +103,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
         RadioButton radioStudents = view.findViewById(R.id.radio_students);
         RadioButton radioGroups = view.findViewById(R.id.radio_groups);
+        ImageView filterBtn = view.findViewById(R.id.filterIVbtn);
         radioStudents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,6 +119,50 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                 isStudentsSelected = false;
                 ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
                 approvalsListView.setAdapter(adp);
+            }
+        });
+
+
+        filterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Inflate the custom filter dialog layout
+                View filterView = LayoutInflater.from(getContext()).inflate(R.layout.history_filter_dialog_layout, null);
+
+// Create a new AlertDialog.Builder and set its view to the custom layout
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setView(filterView);
+
+// Set up the filter options
+                CheckBox activeCheckbox = filterView.findViewById(R.id.active_checkbox);
+                CheckBox expiredCheckbox = filterView.findViewById(R.id.expired_checkbox);
+                CheckBox permanentCheckbox = filterView.findViewById(R.id.permanent_checkbox);
+                CheckBox temporaryCheckbox = filterView.findViewById(R.id.temporary_checkbox);
+
+// Add a positive button to the dialog
+                builder.setPositiveButton("Filter", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get the selected filter options
+                        boolean activeSelected = activeCheckbox.isChecked();
+                        boolean expiredSelected = expiredCheckbox.isChecked();
+                        boolean permanentSelected = permanentCheckbox.isChecked();
+                        boolean temporarySelected = temporaryCheckbox.isChecked();
+
+                        // TODO: Filter the ListView based on the selected options
+                    }
+                });
+
+
+
+// Add a negative button to the dialog
+                builder.setNegativeButton("Cancel", null);
+
+// Create and show the AlertDialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
             }
         });
     }
@@ -186,7 +234,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
 
     public void waitForRequest() {
-        Query query = refApprovals.orderByChild("timeStampApproval");
+        query = refApprovals.orderByChild("timeStampApproval");
 
         incomingRequestsListener = new ValueEventListener() {
             @Override
@@ -206,14 +254,15 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                 groupsNames.clear();
                 approvalCount = 0;
                 approvalTotal = dS.getChildrenCount();
-
+                String stuID;
                 for (DataSnapshot data : dS.getChildren()) {
-                    String str1 = (String) data.getKey();
-                    Log.i("key", str1);
+                    stuID = (String) data.getKey();
+                    Log.i("key", stuID);
                     Approval appTemp = data.getValue(Approval.class);
 
                     if (appTemp.getStudentsID() != null) {
-                        studentsApprovalsID.add(0, str1);
+
+                        studentsApprovalsID.add(0, stuID);
                         studentsApprovals.add(0, appTemp);
                         Log.i("getStudentsID", appTemp.getStudentsID());
 
@@ -256,7 +305,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
                         });
                     } else if (appTemp.getGroupsID() != null) {
-                        groupsApprovalsID.add(0, str1);
+                        groupsApprovalsID.add(0, stuID);
                         groupsApprovals.add(0, appTemp);
                         refGroups.child(appTemp.getGroupsID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String grpTempName = "error";

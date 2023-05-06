@@ -98,7 +98,7 @@ public class student_screen extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         currentUser = mAuth.getCurrentUser();
-        readStudent(currentUser.getUid());
+        readStudent();
     }
 
     public void qr_visibility_switch(View view) {
@@ -133,8 +133,8 @@ public class student_screen extends AppCompatActivity {
 
     }
 
-    public void readStudent(String currentUserID) {
-        Query queryStudent = refStudents.child(currentUserID);
+    public void readStudent() {
+        Query queryStudent = refStudents.child(currentUser.getUid());
         usrListener = new ValueEventListener() {
 
 
@@ -176,7 +176,7 @@ public class student_screen extends AppCompatActivity {
 
 
                                         if (appTemp.getExpirationDate().compareTo(Helper.getCurrentDateString()) < 0) {
-                                            refStudents.child(currentUserID).child("approvalID").setValue(null);
+                                            refStudents.child(currentUser.getUid()).child("approvalID").setValue(null);
                                         } else {
                                             isAllowedTemp = (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString()))
                                                     && Helper.getClassNumber(Helper.getCurrentDateString()) != -1) && appTemp.getDay() == Helper.getDayOfWeekNow();
@@ -233,7 +233,7 @@ public class student_screen extends AppCompatActivity {
                                             Log.d("isitvalid?", "nope it isn't");
                                             Log.d("caman2", "so??? " + Helper.getDayOfWeekNow() + "but is it equal? " + (appTemp.getDay() == Helper.getDayOfWeekNow()));
                                             currentStudent.getPermanentApprovalID().remove(perApprovalID);
-                                            refStudents.child(currentUserID).child("permanentApprovalID").setValue(currentStudent.getPermanentApprovalID());
+                                            refStudents.child(currentUser.getUid()).child("permanentApprovalID").setValue(currentStudent.getPermanentApprovalID());
                                             isAllowedPer = false;
                                         } else {
                                             isAllowedPer = (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
@@ -297,7 +297,7 @@ public class student_screen extends AppCompatActivity {
                             if (grpTemp.getStudentsIDs() != null) {
                                 Log.d("caman", "step 2 " + grpTemp.getStudentsIDs().toString());
 
-                                if (grpTemp.getStudentsIDs().contains(currentUserID)) {
+                                if (grpTemp.getStudentsIDs().contains(currentUser.getUid())) {
 
                                     //possible bug: maybe approval ID is never being set, check it if doesnt work
                                     Log.d("caman", "is it null? " + grpTemp.getApprovalID());
@@ -493,7 +493,7 @@ public class student_screen extends AppCompatActivity {
                 }
             });
 
-        } else if (menuTitle.equals("Join Class")) {
+        } else if (menuTitle.equals("Join Group")) {
             joinGroup(null);
         }
 

@@ -88,7 +88,7 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
                 selectedGroup = dataSnapshot.getValue(Group.class);
                 if (selectedGroup != null) {
                     groupNameHeader.setText(selectedGroup.getGroupName());
-                    groupCodeHeader.setText("קוד כיתה: " + selectedGroup.getJoinCode());
+                    groupCodeHeader.setText("קוד קבוצה: " + selectedGroup.getJoinCode());
 
                     if (selectedGroup.getStudentsIDs() != null) {
                         Log.d("checkLists", selectedGroup.getStudentsIDs().toString());

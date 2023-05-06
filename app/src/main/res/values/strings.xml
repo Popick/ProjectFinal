@@ -18,7 +18,7 @@
     </string-array>
     <string name="title_activity_history_screen2">history_screen2</string>
     <string name="tab_text_1">היסטוריה</string>
-    <string name="tab_text_2">כיתות</string>
+    <string name="tab_text_2">קבוצות</string>
     <string name="tab_text_3">בקשות</string>
     <string name="title_activity_teacher_homescreen">Ishurim</string>
 </resources>

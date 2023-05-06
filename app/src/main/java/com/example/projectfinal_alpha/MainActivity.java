@@ -316,7 +316,6 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             FirebaseAuth.getInstance().signOut();
                             Toast.makeText(MainActivity.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-                            finish();
                         }
                     });
 

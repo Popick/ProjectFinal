@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -65,7 +66,8 @@ public class new_user2 extends AppCompatActivity {
         progressBarUpload = findViewById(R.id.image_load_bar);
         btnNext = findViewById(R.id.next_btn);
 
-        StorageRef = FirebaseStorage.getInstance().getReference("uploads");
+        StorageRef = FirebaseStorage.getInstance().getReference("/uploads/");
+
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -100,6 +102,7 @@ public class new_user2 extends AppCompatActivity {
         if (mImageUri != null) {
             StorageReference fileReference = StorageRef.child(currentUser.getUid()
                     + "." + getFileExtension(mImageUri));
+            Log.d("where_saved", StorageRef.toString() +"   "+ fileReference.toString()+"      "+fileReference.getFile(mImageUri));
 
             UploadTask = fileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
