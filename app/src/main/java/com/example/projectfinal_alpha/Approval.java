@@ -12,9 +12,11 @@ public class Approval {
     String studentsID;
     String groupsID;
     String requestID;
+    Boolean isValid;
+    Boolean isPermanent;
 
 
-    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, String studentsID, String groupsID, String requestID, String expirationDate) {
+    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, String studentsID, String groupsID, String requestID, String expirationDate, Boolean isValid, Boolean isPermanent)  {
         this.timeStampApproval = timeStampApproval;
         this.teAnswer = teAnswer;
         this.teAnswerID = teAnswerID;
@@ -24,6 +26,8 @@ public class Approval {
         this.groupsID = groupsID;
         this.requestID = requestID;
         this.expirationDate = expirationDate;
+        this.isValid = isValid;
+        this.isPermanent = isPermanent;
     }
 
     public Approval(){};
@@ -98,5 +102,21 @@ public class Approval {
 
     public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public Boolean isValid() {
+        return isValid;
+    }
+
+    public void setValid(Boolean valid) {
+        isValid = valid;
+    }
+
+    public Boolean isPermanent() {
+        return isPermanent;
+    }
+
+    public void setPermanent(Boolean permanent) {
+        isPermanent = permanent;
     }
 }

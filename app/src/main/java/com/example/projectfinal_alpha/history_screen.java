@@ -72,6 +72,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     ValueEventListener incomingRequestsListener;
     boolean isStudentsSelected = true;
     private Query query;
+    private boolean validSelected = true, permanentSelected = true, temporarySelected = true;
 
     /**
      * @author Etay Sabag <itay45520@gmail.com>
@@ -108,6 +109,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
             @Override
             public void onClick(View v) {
                 isStudentsSelected = true;
+                filterBtn.setVisibility(View.VISIBLE);
                 ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
                 approvalsListView.setAdapter(adp);
             }
@@ -117,6 +119,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
             @Override
             public void onClick(View v) {
                 isStudentsSelected = false;
+                filterBtn.setVisibility(View.INVISIBLE);
                 ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
                 approvalsListView.setAdapter(adp);
             }
@@ -133,9 +136,8 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setView(filterView);
 
-// Set up the filter options
+//// Set up the filter options
                 CheckBox activeCheckbox = filterView.findViewById(R.id.active_checkbox);
-                CheckBox expiredCheckbox = filterView.findViewById(R.id.expired_checkbox);
                 CheckBox permanentCheckbox = filterView.findViewById(R.id.permanent_checkbox);
                 CheckBox temporaryCheckbox = filterView.findViewById(R.id.temporary_checkbox);
 
@@ -144,15 +146,15 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Get the selected filter options
-                        boolean activeSelected = activeCheckbox.isChecked();
-                        boolean expiredSelected = expiredCheckbox.isChecked();
-                        boolean permanentSelected = permanentCheckbox.isChecked();
-                        boolean temporarySelected = temporaryCheckbox.isChecked();
-
-                        // TODO: Filter the ListView based on the selected options
+                        validSelected = activeCheckbox.isChecked();
+                        permanentSelected = permanentCheckbox.isChecked();
+                        temporarySelected = temporaryCheckbox.isChecked();
+                        if (incomingRequestsListener != null) {
+                            refTeachers.removeEventListener(incomingRequestsListener);
+                        }
+                        waitForRequest();
                     }
                 });
-
 
 
 // Add a negative button to the dialog
@@ -166,8 +168,6 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
             }
         });
     }
-
-
 
 
 //    @Override
@@ -234,7 +234,8 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
 
     public void waitForRequest() {
-        query = refApprovals.orderByChild("timeStampApproval");
+        Query query = refApprovals.orderByChild("timeStampApproval");
+
 
         incomingRequestsListener = new ValueEventListener() {
             @Override
@@ -261,49 +262,56 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                     Approval appTemp = data.getValue(Approval.class);
 
                     if (appTemp.getStudentsID() != null) {
+                        if ((validSelected && appTemp.isValid()) && ((permanentSelected && appTemp.isPermanent()) || (temporarySelected && !appTemp.isPermanent()))) {
+                            Log.d("booleans", "valid: " + validSelected + " permanent: " + permanentSelected + " temporary: " + temporarySelected);
+                            Log.d("booleans", "appValid: " + appTemp.isValid() + " appPermanent: " + appTemp.isPermanent());
+                            studentsApprovalsID.add(0, stuID);
+                            studentsApprovals.add(0, appTemp);
+                            Log.i("getStudentsID", appTemp.getStudentsID());
 
-                        studentsApprovalsID.add(0, stuID);
-                        studentsApprovals.add(0, appTemp);
-                        Log.i("getStudentsID", appTemp.getStudentsID());
+                            refStudents.child(appTemp.getStudentsID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                String stuTempName = "error";
+                                String stuTempGrade = "error";
+                                String stuTempClass = "error";
+                                int stuIndex = 0;
+                                String time = "00:00";
 
-                        refStudents.child(appTemp.getStudentsID()).addListenerForSingleValueEvent(new ValueEventListener() {
-                            String stuTempName = "error";
-                            String stuTempGrade = "error";
-                            String stuTempClass = "error";
-                            int stuIndex = 0;
-                            String time = "00:00";
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // This method is called once with the initial value.
+                                    Student stuTemp = dataSnapshot.getValue(Student.class);
+                                    stuTempName = stuTemp.getName();
 
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                // This method is called once with the initial value.
-                                Student stuTemp = dataSnapshot.getValue(Student.class);
-                                stuTempName = stuTemp.getName();
-
-                                stuTempGrade = Helper.getGrade(stuTemp.getGrade());
-                                stuTempClass = stuTemp.getaClass();
+                                    stuTempGrade = Helper.getGrade(stuTemp.getGrade());
+                                    stuTempClass = stuTemp.getaClass();
 
 //                                timeArray.add(appTemp.getTimeStampApproval());
 //                                Collections.sort(timeArray, Collections.reverseOrder());
-                                time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
+                                    time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
 
 
-                                studentsNames.add(0, "התלמיד " + stuTemp.getName());
-                                studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
-                                Log.w("worked", studentsApprovalsHeadLine.get(0));
-                                if (isStudentsSelected) {
-                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
-                                    approvalsListView.setAdapter(adp);
+                                    studentsNames.add(0, "התלמיד " + stuTemp.getName());
+                                    studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
+                                    Log.w("worked", studentsApprovalsHeadLine.get(0));
+                                    if (isStudentsSelected) {
+                                        ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+                                        approvalsListView.setAdapter(adp);
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(DatabaseError error) {
-                                // Failed to read value
-                                Log.w("failed", "Failed to read value.", error.toException());
+                                @Override
+                                public void onCancelled(DatabaseError error) {
+                                    // Failed to read value
+                                    Log.w("failed", "Failed to read value.", error.toException());
 
-                            }
+                                }
 
-                        });
+                            });
+                        }else{
+                            approvalsListView.setAdapter(null);
+                        }
+
+
                     } else if (appTemp.getGroupsID() != null) {
                         groupsApprovalsID.add(0, stuID);
                         groupsApprovals.add(0, appTemp);
@@ -370,9 +378,6 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-
-
-
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.main, menu);
 //
@@ -410,13 +415,12 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                     + "ליום " + Helper.getDayOfWeekInHebrew(selectedApproval.getDay()) + "\n"
                     + "בשעה " + selectedApproval.getHour().toString().substring(1, selectedApproval.getHour().toString().length() - 1) + "\n";
 
-            if (true) {
-                bodyString = bodyString + "אישור חד פעמי\n";
-            } else {
+            if (selectedApproval.isPermanent()) {
                 bodyString = bodyString + "אישור שבועי\n";
+            } else {
+                bodyString = bodyString + "אישור חד פעמי\n";
             }
             bodyString = bodyString + "אישור ניתן ב " + Helper.stringToDateFull(selectedApproval.getTimeStampApproval());
-
 
 
             builder.setMessage(bodyString).setTitle(studentsNames.get(i));
@@ -424,8 +428,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
             // Create and show the dialog
             AlertDialog dialog = builder.create();
             dialog.show();
-        }
-        else{
+        } else {
             Log.d("the item is", "pos:" + i + " the id belongs to " + groupsApprovalsID.get(i));
             Approval selectedApproval = groupsApprovals.get(i);
             // Create an AlertDialog builder

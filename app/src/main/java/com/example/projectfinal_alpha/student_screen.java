@@ -176,7 +176,12 @@ public class student_screen extends AppCompatActivity {
 
 
                                         if (appTemp.getExpirationDate().compareTo(Helper.getCurrentDateString()) < 0) {
-                                            refStudents.child(currentUser.getUid()).child("approvalID").setValue(null);
+                                            currentStudent.getApprovalID().remove(approvalID);
+                                            refStudents.child(currentUser.getUid()).child("approvalID").setValue(currentStudent.getApprovalID());
+                                            refApprovals.child(approvalID).child("isValid").setValue(false);
+
+                                            isAllowedTemp = false;
+
                                         } else {
                                             isAllowedTemp = (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString()))
                                                     && Helper.getClassNumber(Helper.getCurrentDateString()) != -1) && appTemp.getDay() == Helper.getDayOfWeekNow();
@@ -234,6 +239,8 @@ public class student_screen extends AppCompatActivity {
                                             Log.d("caman2", "so??? " + Helper.getDayOfWeekNow() + "but is it equal? " + (appTemp.getDay() == Helper.getDayOfWeekNow()));
                                             currentStudent.getPermanentApprovalID().remove(perApprovalID);
                                             refStudents.child(currentUser.getUid()).child("permanentApprovalID").setValue(currentStudent.getPermanentApprovalID());
+                                            refApprovals.child(perApprovalID).child("isValid").setValue(false);
+
                                             isAllowedPer = false;
                                         } else {
                                             isAllowedPer = (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
@@ -314,6 +321,8 @@ public class student_screen extends AppCompatActivity {
                                                     // לצורכי דיבוג בלבד, בפרודקשן אחרי שעות הלימודים לתלמיד תמיד יהיה מותר לצאת
                                                     isAllowedGroup = ((appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
                                                             Helper.getClassNumber(Helper.getCurrentDateString()) != -1) && appTemp.getDay() == Helper.getDayOfWeekNow());
+                                                            refApprovals.child(grpTemp.getApprovalID()).child("isValid").setValue(false);
+
                                                     if (isAllowedGroup) {
                                                         atLeastOneGroup = true;
                                                         fillUI(currentStudent);

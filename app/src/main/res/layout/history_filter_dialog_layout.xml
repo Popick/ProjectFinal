@@ -1,17 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:textDirection="rtl"
     android:layoutDirection="rtl"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:textDirection="rtl">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="סנן לפי תוקף"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,20 +24,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
+            android:checked="true"
             android:text="אישור בתוקף" />
 
-        <CheckBox
-            android:id="@+id/expired_checkbox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:text="אישור פג תוקף" />
-    </LinearLayout>
 
+    </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
+
 
     <Space
         android:layout_width="match_parent"
@@ -48,7 +45,7 @@
         android:layout_height="wrap_content"
         android:text="סנן לפי סוג"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -60,15 +57,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
+            android:checked="true"
             android:text="אישור קבוע" />
 
         <CheckBox
             android:id="@+id/temporary_checkbox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textDirection="rtl"
             android:layout_weight="5"
-            android:text="אישור זמני" />
+            android:checked="true"
+            android:text="אישור זמני"
+            android:textDirection="rtl" />
+
     </LinearLayout>
 
 </LinearLayout>

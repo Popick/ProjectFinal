@@ -217,7 +217,7 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
     public void onPause() {
         super.onPause();
         if (incomingRequestsListener != null) {
-            refTeachers.removeEventListener(incomingRequestsListener);
+            refRequests.removeEventListener(incomingRequestsListener);
         }
 
     }
@@ -294,7 +294,9 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                         selectedRequest.getStuID(),
                         null,
                         selectedRequest.getRequestID(),
-                        null);
+                        null,
+                        false,false);
+
 
                 DatabaseReference currentApprovalRef = refApprovals.push();
                 currentApprovalRef.setValue(stuApproval);
@@ -320,7 +322,8 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                         selectedRequest.getStuID(),
                         null,
                         selectedRequest.getRequestID(),
-                        null);
+                        null
+                        ,true,!selectedRequest.isTemp());
 
 
                 if (selectedRequest.isTemp()) {

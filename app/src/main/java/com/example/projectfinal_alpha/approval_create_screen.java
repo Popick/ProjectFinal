@@ -4,6 +4,7 @@ import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refStudents;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.ArraySet;
@@ -11,7 +12,6 @@ import androidx.collection.ArraySet;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -102,7 +102,8 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                                     studentIDs.get(studentNames.indexOf(parent.getItemAtPosition(position))),
                                     null,
                                     null,
-                                    Helper.getNextWeekDateString());
+                                    Helper.getNextWeekDateString(),
+                                    true,false);
 
                             DatabaseReference currentApprovalRef = refApprovals.push();
                             currentApprovalRef.setValue(stuApproval);
@@ -146,7 +147,8 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                                     null,
                                     groupIDs.get(groupNames.indexOf(parent.getItemAtPosition(position))),
                                     null,
-                                    Helper.getNextWeekDateString());
+                                    Helper.getNextWeekDateString(),
+                                    true ,false);
 
                             DatabaseReference currentApprovalRef = refApprovals.push();
                             currentApprovalRef.setValue(stuApproval);
