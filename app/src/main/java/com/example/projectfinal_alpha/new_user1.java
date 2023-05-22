@@ -33,18 +33,18 @@ import java.util.ArrayList;
  */
 public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    Spinner grade_spinner;
-//    class_spinner, groupA_spinner, groupB_spinner;
+    Spinner grade_spinner, class_spinner;
+//    groupA_spinner, groupB_spinner;
     String[] grades = {"", "ז", "ח", "ט", "י", "יא", "יב"};
     int[] gradesnums = {0, 7, 8, 9, 10, 11, 12};
     String[] classes = {"", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-    String[] groupA = {"", "פסיכולוגיה", "אומנות", "כימיה", "תקשורת", "מחשבים", "אלקטרוניקה", "הנדסת בניין", "לאי", "מדח", "מחשבת ישראל"};
-    String[] groupB = {"", "פיסיקה", "ביוטכנולוגיה", "ביולוגיה"};
+//    String[] groupA = {"", "פסיכולוגיה", "אומנות", "כימיה", "תקשורת", "מחשבים", "אלקטרוניקה", "הנדסת בניין", "לאי", "מדח", "מחשבת ישראל"};
+//    String[] groupB = {"", "פיסיקה", "ביוטכנולוגיה", "ביולוגיה"};
     int studentGrade = -1;
     int studentClass = -1;
-//    ArrayList<Integer> groups = new ArrayList<Integer>();
-    String studentGroupA;
-    String studentGroupB;
+    //    ArrayList<Integer> groups = new ArrayList<Integer>();
+//    String studentGroupA;
+//    String studentGroupB;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
@@ -58,9 +58,10 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user1);
         grade_spinner = (Spinner) findViewById(R.id.grade_spinner);
-//        class_spinner = (Spinner) findViewById(R.id.class_spinner);
+        class_spinner = (Spinner) findViewById(R.id.class_spinner);
 //        groupA_spinner = (Spinner) findViewById(R.id.groupA_spinner);
 //        groupB_spinner = (Spinner) findViewById(R.id.groupB_spinner);
+
 //        groupA_spinner.setEnabled(false);
 //        groupA_spinner.setClickable(false);
 //        groupB_spinner.setEnabled(false);
@@ -83,8 +84,8 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, grades);
         grade_spinner.setAdapter(adp);
 
-//        adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, classes);
-//        class_spinner.setAdapter(adp);
+        adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, classes);
+        class_spinner.setAdapter(adp);
 
 //        adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupA);
 //        groupA_spinner.setAdapter(adp);
@@ -93,7 +94,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 //        groupB_spinner.setAdapter(adp);
 
         grade_spinner.setOnItemSelectedListener(this);
-//        class_spinner.setOnItemSelectedListener(this);
+        class_spinner.setOnItemSelectedListener(this);
 //        groupA_spinner.setOnItemSelectedListener(this);
 //        groupB_spinner.setOnItemSelectedListener(this);
 
@@ -102,15 +103,37 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
     }
 
     public boolean check_input() {
-        if (studentGrade == -1) {
-            Toast.makeText(this, "please select grade", Toast.LENGTH_SHORT).show();
+        if (studentGrade == -1 || studentClass == -1) {
+            Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
             return false;
+        } else {
+            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", null, null, null, null);
+            Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
+            return true;
         }
-        return true;
     }
 
+    public void go_to_activity_guard(View view) {
+        Guard newuser = new Guard(currentUser.getDisplayName(), "Guard");
+        refGuards.child(currentUser.getUid()).setValue(newuser);
+        Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    public void go_to_activity_teacher(View view) {
+        if (studentGrade == -1 || studentClass == -1) {
+
+            Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
+
+        } else {
+            Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher", "0");
+            refTeachers.child(currentUser.getUid()).setValue(newuser);
+            Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
 
+    }
 
     public void go_to_new_user2(View view) {
         if (check_input()) {
@@ -126,28 +149,12 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         if (i == 0) {
             studentGrade = -1;
             studentClass = -1;
-            studentGroupA = null;
-            studentGroupB = null;
+
         } else {
             if (adapterView == grade_spinner) {
                 studentGrade = gradesnums[i];
-                if (studentGrade > 9) {
-//                    groupA_spinner.setEnabled(true);
-//                    groupA_spinner.setClickable(true);
-//                    groupB_spinner.setEnabled(true);
-//                    groupB_spinner.setClickable(true);
-                } else {
-//                    groupA_spinner.setEnabled(false);
-//                    groupA_spinner.setClickable(false);
-//                    groupB_spinner.setEnabled(false);
-//                    groupB_spinner.setClickable(false);
-                }
-//            } else if (adapterView == class_spinner) {
-//                studentClass = Integer.parseInt(classes[i]);
-//            } else if (adapterView == groupA_spinner) {
-//                studentGroupA = groupA[i];
-//            } else if (adapterView == groupB_spinner) {
-//                studentGroupB = groupB[i];
+            } else if (adapterView == class_spinner) {
+                studentClass = Integer.parseInt(classes[i]);
             }
         }
     }
@@ -172,4 +179,3 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
 
 }
-

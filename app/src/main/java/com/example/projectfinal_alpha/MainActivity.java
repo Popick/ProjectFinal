@@ -18,12 +18,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -157,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d("Working!", "signInWithCredential:success");
                                     user = mAuth.getCurrentUser();
+
                                     updateUI(user);
 
                                 } else {
@@ -224,17 +229,42 @@ public class MainActivity extends AppCompatActivity {
                                                             if(i==0){
                                                                 startActivity(siSignUp);
                                                             }else if(i==1){
-                                                                Teacher newuser=new Teacher(account.getDisplayName(),"Teacher","0");
-                                                                refTeachers.child(account.getUid()).setValue(newuser);
-                                                                Toast.makeText(MainActivity.this,"google account is now set as teacher",Toast.LENGTH_SHORT).show();
-                                                                startActivity(siTeacher);
-                                                                FirebaseMessaging.getInstance().subscribeToTopic("Teaching")
-                                                                        .addOnSuccessListener(new OnSuccessListener<Void>(){
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid){
-                                                                                System.out.println("Subscription successful");
-                                                                            }
-                                                                        });
+//                                                                Teacher newuser=new Teacher(account.getDisplayName(),"Teacher","0");
+//                                                                refTeachers.child(account.getUid()).setValue(newuser);
+//                                                                Toast.makeText(MainActivity.this,"google account is now set as teacher",Toast.LENGTH_SHORT).show();
+
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                builder.setTitle("הכנס קוד");
+
+                                                                EditText editTextCode = new EditText(MainActivity.this);
+                                                                editTextCode.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                                editTextCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
+                                                                editTextCode.setHint("קוד בעל 5 ספרות");
+
+                                                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                                                                editTextCode.setLayoutParams(layoutParams);
+
+                                                                builder.setView(editTextCode);
+
+                                                                builder.setPositiveButton("אישור", (dialog, which) -> {
+                                                                    String enteredCode = editTextCode.getText().toString();
+                                                                    if (enteredCode.equals("12345")) {
+                                                                        // Code matches, navigate to a new activity
+                                                                        Intent siTeacherSignUp = new Intent(MainActivity.this, new_teacher.class);
+                                                                        startActivity(siTeacherSignUp);
+                                                                    } else {
+                                                                        Toast.makeText(MainActivity.this, "Invalid code", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                });
+
+                                                                builder.setNegativeButton("Cancel", null);
+
+                                                                AlertDialog dialog = builder.create();
+                                                                dialog.show();
+
                                                             }else{
                                                                 Guard newuser = new Guard(account.getDisplayName(),"Guard");
                                                                 refGuards.child(account.getUid()).setValue(newuser);

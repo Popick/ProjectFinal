@@ -290,7 +290,7 @@ public class student_screen extends AppCompatActivity {
              */
             @Override
             public void onDataChange(DataSnapshot dS) {
-                if (currentStudent.getApprovalID() == null || (!isAllowedTemp && !isAllowedPer)) {
+                if (currentStudent!=null && (currentStudent.getApprovalID() == null || (!isAllowedTemp && !isAllowedPer))) {
                     atLeastOneGroup = false;
                     Log.d("caman", "step 0 ");
                     int i = 0;
@@ -321,7 +321,8 @@ public class student_screen extends AppCompatActivity {
                                                     // לצורכי דיבוג בלבד, בפרודקשן אחרי שעות הלימודים לתלמיד תמיד יהיה מותר לצאת
                                                     isAllowedGroup = ((appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
                                                             Helper.getClassNumber(Helper.getCurrentDateString()) != -1) && appTemp.getDay() == Helper.getDayOfWeekNow());
-                                                            refApprovals.child(grpTemp.getApprovalID()).child("isValid").setValue(false);
+
+                                                    refApprovals.child(grpTemp.getApprovalID()).child("isValid").setValue(false);
 
                                                     if (isAllowedGroup) {
                                                         atLeastOneGroup = true;
