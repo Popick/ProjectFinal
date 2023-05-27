@@ -3,6 +3,8 @@ package com.example.projectfinal_alpha;
 import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refStudents;
+import static com.example.projectfinal_alpha.teacher_homescreen.currentTeacher;
+import static com.example.projectfinal_alpha.teacher_homescreen.teacherStudentsIds;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -103,7 +105,7 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                                     null,
                                     null,
                                     Helper.getNextWeekDateString(),
-                                    true,false);
+                                    true, false);
 
                             DatabaseReference currentApprovalRef = refApprovals.push();
                             currentApprovalRef.setValue(stuApproval);
@@ -148,7 +150,7 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                                     groupIDs.get(groupNames.indexOf(parent.getItemAtPosition(position))),
                                     null,
                                     Helper.getNextWeekDateString(),
-                                    true ,false);
+                                    true, false);
 
                             DatabaseReference currentApprovalRef = refApprovals.push();
                             currentApprovalRef.setValue(stuApproval);
@@ -187,7 +189,6 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
     }
 
 
-
     public void loadStudents(View view) {
         isStudentsSelected = true;
         refStudents.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -197,10 +198,12 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                 studentIDs.clear();
                 studentsList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Student tempStu = snapshot.getValue(Student.class);
-                    studentNames.add(tempStu.getName());
-                    studentIDs.add(snapshot.getKey());
-                    studentsList.add(tempStu);
+                    if (teacherStudentsIds.contains(snapshot.getKey())) {
+                        Student tempStu = snapshot.getValue(Student.class);
+                        studentNames.add(tempStu.getName());
+                        studentIDs.add(snapshot.getKey());
+                        studentsList.add(tempStu);
+                    }
                 }
 
                 // Load student names into ListView
@@ -226,10 +229,12 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
                 groupIDs.clear();
                 groupsList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Group tempGrp = snapshot.getValue(Group.class);
-                    groupNames.add(tempGrp.getGroupName());
-                    groupIDs.add(snapshot.getKey());
-                    groupsList.add(tempGrp);
+                    if (currentTeacher.getGroups().contains(snapshot.getKey())) {
+                        Group tempGrp = snapshot.getValue(Group.class);
+                        groupNames.add(tempGrp.getGroupName());
+                        groupIDs.add(snapshot.getKey());
+                        groupsList.add(tempGrp);
+                    }
                 }
 
                 adapter = new ArrayAdapter<>(approval_create_screen.this,

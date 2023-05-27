@@ -6,6 +6,8 @@ import static com.example.projectfinal_alpha.FBref.refRequests;
 import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
+import static com.example.projectfinal_alpha.teacher_homescreen.currentTeacher;
+import static com.example.projectfinal_alpha.teacher_homescreen.teacherStudentsIds;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -262,52 +264,56 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                     Approval appTemp = data.getValue(Approval.class);
 
                     if (appTemp.getStudentsID() != null) {
-                        if ((validSelected && appTemp.isValid()) && ((permanentSelected && appTemp.isPermanent()) || (temporarySelected && !appTemp.isPermanent()))) {
-                            Log.d("booleans", "valid: " + validSelected + " permanent: " + permanentSelected + " temporary: " + temporarySelected);
-                            Log.d("booleans", "appValid: " + appTemp.isValid() + " appPermanent: " + appTemp.isPermanent());
-                            studentsApprovalsID.add(0, stuID);
-                            studentsApprovals.add(0, appTemp);
-                            Log.i("getStudentsID", appTemp.getStudentsID());
+                        if (teacherStudentsIds.contains(appTemp.getStudentsID())) {
+                            if ((validSelected && appTemp.isValid()) && ((permanentSelected && appTemp.isPermanent()) || (temporarySelected && !appTemp.isPermanent()))) {
+                                Log.d("booleans", "valid: " + validSelected + " permanent: " + permanentSelected + " temporary: " + temporarySelected);
+                                Log.d("booleans", "appValid: " + appTemp.isValid() + " appPermanent: " + appTemp.isPermanent());
+                                studentsApprovalsID.add(0, stuID);
+                                studentsApprovals.add(0, appTemp);
+                                Log.i("getStudentsID", appTemp.getStudentsID());
 
-                            refStudents.child(appTemp.getStudentsID()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                String stuTempName = "error";
-                                String stuTempGrade = "error";
-                                String stuTempClass = "error";
-                                int stuIndex = 0;
-                                String time = "00:00";
+                                refStudents.child(appTemp.getStudentsID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    String stuTempName = "error";
+                                    String stuTempGrade = "error";
+                                    String stuTempClass = "error";
+                                    int stuIndex = 0;
+                                    String time = "00:00";
 
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    // This method is called once with the initial value.
-                                    Student stuTemp = dataSnapshot.getValue(Student.class);
-                                    stuTempName = stuTemp.getName();
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        // This method is called once with the initial value.
+                                        if (dataSnapshot.exists()) {
+                                            Student stuTemp = dataSnapshot.getValue(Student.class);
+                                            stuTempName = stuTemp.getName();
 
-                                    stuTempGrade = Helper.getGrade(stuTemp.getGrade());
-                                    stuTempClass = stuTemp.getaClass();
+                                            stuTempGrade = Helper.getGrade(stuTemp.getGrade());
+                                            stuTempClass = stuTemp.getaClass();
 
 //                                timeArray.add(appTemp.getTimeStampApproval());
 //                                Collections.sort(timeArray, Collections.reverseOrder());
-                                    time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
+                                            time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
 
 
-                                    studentsNames.add(0, "התלמיד " + stuTemp.getName());
-                                    studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
-                                    Log.w("worked", studentsApprovalsHeadLine.get(0));
-                                    if (isStudentsSelected) {
-                                        ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
-                                        approvalsListView.setAdapter(adp);
+                                            studentsNames.add(0, "התלמיד " + stuTemp.getName());
+                                            studentsApprovalsHeadLine.add(0, "התלמיד  " + stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
+                                            Log.w("worked", studentsApprovalsHeadLine.get(0));
+                                            if (isStudentsSelected && getContext()!=null) {
+                                                ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentsApprovalsHeadLine);
+                                                approvalsListView.setAdapter(adp);
+                                            }
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(DatabaseError error) {
-                                    // Failed to read value
-                                    Log.w("failed", "Failed to read value.", error.toException());
+                                    @Override
+                                    public void onCancelled(DatabaseError error) {
+                                        // Failed to read value
+                                        Log.w("failed", "Failed to read value.", error.toException());
 
-                                }
+                                    }
 
-                            });
-                        }else{
+                                });
+                            }
+                        } else {
                             approvalsListView.setAdapter(null);
                         }
 
@@ -326,27 +332,29 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 // This method is called once with the initial value.
                                 Group grpTemp = dataSnapshot.getValue(Group.class);
-                                if (grpTemp != null) {
-                                    grpTempName = grpTemp.getGroupName();
+                                if (currentTeacher.getGroups().contains(dataSnapshot.getKey())) {
+                                    if (grpTemp != null) {
+                                        grpTempName = grpTemp.getGroupName();
 
-                                    grpTempTeacher = grpTemp.getTeacherName();
+                                        grpTempTeacher = grpTemp.getTeacherName();
 //                                stuTempClass = stuTemp.getaClass();
 
 //                                    timeArray.add(appTemp.getTimeStampApproval());
 //                                    Collections.sort(timeArray, Collections.reverseOrder());
 
-                                    time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
+                                        time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
 
-                                    groupsNames.add(0, "הקבוצה " + grpTemp.getGroupName());
-                                    groupsApprovalsHeadLine.add(0, "הקבוצה  " + grpTempName + " - " + grpTempTeacher + "      " + time);
+                                        groupsNames.add(0, "הקבוצה " + grpTemp.getGroupName());
+                                        groupsApprovalsHeadLine.add(0, "הקבוצה  " + grpTempName + " - " + grpTempTeacher + "      " + time);
 
-                                } else {
-                                    groupsNames.add(0, "קבוצה נמחקה");
-                                    groupsApprovalsHeadLine.add(0, "הקבוצה נמחקה");
-                                }
-                                if (!isStudentsSelected) {
-                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
-                                    approvalsListView.setAdapter(adp);
+                                    } else {
+                                        groupsNames.add(0, "קבוצה נמחקה");
+                                        groupsApprovalsHeadLine.add(0, "הקבוצה נמחקה");
+                                    }
+                                    if (!isStudentsSelected) {
+                                        ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, groupsApprovalsHeadLine);
+                                        approvalsListView.setAdapter(adp);
+                                    }
                                 }
                             }
 
@@ -373,6 +381,8 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
             }
         };
+
+
         query.addValueEventListener(incomingRequestsListener);
 
     }

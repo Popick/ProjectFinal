@@ -5,6 +5,7 @@ import static com.example.projectfinal_alpha.FBref.refRequests;
 import static com.example.projectfinal_alpha.FBref.refStudents;
 import static com.example.projectfinal_alpha.FBref.refTeachers;
 import static com.example.projectfinal_alpha.FBref.refUsers;
+import static com.example.projectfinal_alpha.teacher_homescreen.teacherStudentsIds;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -76,7 +77,6 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
     ValueEventListener incomingRequestsListener;
     boolean isallowedflipper = true;
 
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_teacher_screen, container, false);
@@ -92,9 +92,9 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
 
+
         return rootView;
     }
-
 
 
 //    @Override
@@ -132,25 +132,17 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
         incomingRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dS) {
-                requestsID.clear();
                 requests.clear();
                 students.clear();
                 requestsHeadLine.clear();
 
 
                 for (DataSnapshot data : dS.getChildren()) {
-                    String str1 = (String) data.getKey();
-                    requestsID.add(0, str1);
-                    Log.i("key", str1);
+                    String requestKey = (String) data.getKey();
                     Request rqTemp = data.getValue(Request.class);
                     if (rqTemp.isPending()) {
-                        rqTemp.setRequestID(str1);
-                        requests.add(0, rqTemp);
-//                    try {
-//                         time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
+                        rqTemp.setRequestID(requestKey);
+
 //todo somehow fix multiple times the same request on data change.
                         refStudents.child(rqTemp.getStuID()).addListenerForSingleValueEvent(new ValueEventListener() {
                             String stuTempName = "error";
@@ -160,28 +152,32 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
 
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                // This method is called once with the initial value.
-                                Student stuTemp = dataSnapshot.getValue(Student.class);
-                                stuTempName = stuTemp.getName();
-                                students.add(0, stuTemp);
+                                if (teacherStudentsIds.contains(dataSnapshot.getKey())) {
 
-                                stuTempGrade = Helper.getGrade(stuTemp.getGrade());
-                                stuTempClass = stuTemp.getaClass();
+                                    // This method is called once with the initial value.
+                                    Student stuTemp = dataSnapshot.getValue(Student.class);
+                                    stuTempName = stuTemp.getName();
+                                    requests.add(0, rqTemp);
+                                    students.add(0, stuTemp);
 
-                                time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
+                                    stuTempGrade = Helper.getGrade(stuTemp.getGrade());
+                                    stuTempClass = stuTemp.getaClass();
 
-                                Log.w("worked", stuTempName);
+                                    time = Helper.stringToDateTime(rqTemp.getTimeStampRequest());
 
-                                requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
-//                            Collections.reverse(requestsHeadLine);
-                                ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
-                                requestsListView.setAdapter(adp);
-                                if (requestsListView.getAdapter() == null) {
-                                    noRequestsTV.setVisibility(View.VISIBLE);
-                                } else {
-                                    noRequestsTV.setVisibility(View.INVISIBLE);
+                                    Log.w("worked", stuTempName);
+
+                                    requestsHeadLine.add(0, stuTempName + " - " + stuTempGrade + stuTempClass + "      " + time);
+
+                                    ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, requestsHeadLine);
+                                    requestsListView.setAdapter(adp);
+                                    if (requestsListView.getAdapter() == null) {
+                                        noRequestsTV.setVisibility(View.VISIBLE);
+                                    } else {
+                                        noRequestsTV.setVisibility(View.INVISIBLE);
+                                    }
+
                                 }
-
                             }
 
                             @Override
@@ -200,7 +196,6 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                 }
 
 
-
             }
 
 
@@ -208,7 +203,9 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        };
+        }
+
+        ;
         query.addValueEventListener(incomingRequestsListener);
 
 
@@ -257,7 +254,6 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.d("the item is", "pos:" + i + " the id belongs to " + requestsID.get(i));
 
         isallowedflipper = !isallowedflipper;
 
@@ -295,7 +291,7 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                         null,
                         selectedRequest.getRequestID(),
                         null,
-                        false,false);
+                        false, false);
 
 
                 DatabaseReference currentApprovalRef = refApprovals.push();
@@ -323,7 +319,7 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                         null,
                         selectedRequest.getRequestID(),
                         null
-                        ,true,!selectedRequest.isTemp());
+                        , true, !selectedRequest.isTemp());
 
 
                 if (selectedRequest.isTemp()) {

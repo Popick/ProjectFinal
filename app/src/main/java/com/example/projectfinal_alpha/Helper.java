@@ -2,9 +2,11 @@ package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refStudents;
+import static com.example.projectfinal_alpha.FBref.refTeachers;
 
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Random;
 
 public class Helper {
 
@@ -220,7 +223,7 @@ public class Helper {
                     refGroups.child(groupID).setValue(tempGroup);
 
                 } else {
-
+                    Log.d("addToGroup", "group doesn't exist");
                 }
             }
 
@@ -287,5 +290,79 @@ public class Helper {
 
     }
 
+    public static void writeGroup(String groupName, FirebaseUser currentUser) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(5);
+        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+        for (int i = 0; i < 5; i++) {
+            sb.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        String joinCode = sb.toString();
+
+        refGroups.orderByChild("joinCode").equalTo(joinCode).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    writeGroup(groupName, currentUser);
+                } else {
+                    Group newGroup = new Group(currentUser.getDisplayName(), currentUser.getUid(), groupName, joinCode, false);
+                    String groupID = refGroups.push().getKey();
+                    refGroups.child(groupID).setValue(newGroup);
+
+                    refTeachers.child(currentUser.getUid()).child("groups").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<String> groups;
+                            if (dataSnapshot.exists()) {
+                                groups = (ArrayList<String>) dataSnapshot.getValue();
+                            } else {
+                                groups = new ArrayList<String>();
+                            }
+                            groups.add(groupID);
+                            refTeachers.child(currentUser.getUid()).child("groups").setValue(groups);
+
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors that may occur during the operation
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle error
+            }
+        });
+
+
+    }
+
+    public static void deleteGroup(String groupID, String teacherID) {
+        refGroups.child(groupID).removeValue();
+
+        refTeachers.child(teacherID).child("groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    ArrayList<String> groups = (ArrayList<String>) dataSnapshot.getValue();
+                    groups.remove(groupID);
+                    refTeachers.child(teacherID).child("groups").setValue(groups);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the operation
+            }
+        });
+
+
+    }
 
 }

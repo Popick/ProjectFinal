@@ -1,17 +1,18 @@
 package com.example.projectfinal_alpha;
 
+import java.util.ArrayList;
+
 public class Teacher {
-        private String name;
-        private String userType;
-        private String level;
+    private String name;
+    private String userType;
+    private ArrayList<String> groups;
 
-        public Teacher() {
-        }
+    public Teacher() {
+    }
 
-    public Teacher(String name, String userType, String level) {
+    public Teacher(String name, String userType) {
         this.name = name;
         this.userType = userType;
-        this.level = level;
     }
 
     public String getName() {
@@ -30,11 +31,11 @@ public class Teacher {
         this.userType = userType;
     }
 
-    public String getLevel() {
-        return level;
+    public ArrayList<String> getGroups() {
+        return groups;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public void setGroups(ArrayList<String> groups) {
+        this.groups = groups;
     }
 }

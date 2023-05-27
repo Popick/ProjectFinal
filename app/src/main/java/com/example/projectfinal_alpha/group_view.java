@@ -25,9 +25,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -45,8 +49,10 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
     ArrayList<String> waitStudentNames = new ArrayList<String>();;
     Group selectedGroup;
     ValueEventListener incomingRequestsListener;
-    
 
+    GoogleSignInClient mGoogleSignInClient;
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +70,11 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
 
         groupNameHeader = (TextView) findViewById(R.id.groupNameTV);
         groupCodeHeader = (TextView) findViewById(R.id.groupCodeTV);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        mAuth = FirebaseAuth.getInstance();
 
 
         groupCodeHeader.setOnLongClickListener(new View.OnLongClickListener() {
@@ -165,6 +176,7 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
     @Override
     protected void onResume() {
         super.onResume();
+        currentUser = mAuth.getCurrentUser();
         loadGroup();
     }
 
@@ -257,15 +269,15 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
             builder.setTitle("Delete Group");
             builder.setMessage("Are you sure you want to delete this group?");
 
-            builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("מחק", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    refGroups.child(groupID).removeValue();
+                    Helper.deleteGroup(groupID, currentUser.getUid());
                     finish();
                 }
             });
 
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("בטל", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    FirebaseUser user;
 
 //TODO: FIX THE SCREEN FOR REGISTERED USERS, OR MAYBE JUST BLOCK ACCESS FROM GOING BACK
 
@@ -160,9 +159,9 @@ public class MainActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d("Working!", "signInWithCredential:success");
-                                    user = mAuth.getCurrentUser();
+                                    currentUser = mAuth.getCurrentUser();
 
-                                    updateUI(user);
+                                    updateUI(currentUser);
 
                                 } else {
                                     // If sign in fails, display a message to the user.
@@ -229,17 +228,13 @@ public class MainActivity extends AppCompatActivity {
                                                             if(i==0){
                                                                 startActivity(siSignUp);
                                                             }else if(i==1){
-//                                                                Teacher newuser=new Teacher(account.getDisplayName(),"Teacher","0");
-//                                                                refTeachers.child(account.getUid()).setValue(newuser);
-//                                                                Toast.makeText(MainActivity.this,"google account is now set as teacher",Toast.LENGTH_SHORT).show();
-
+//
                                                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                                                 builder.setTitle("הכנס קוד");
 
                                                                 EditText editTextCode = new EditText(MainActivity.this);
                                                                 editTextCode.setInputType(InputType.TYPE_CLASS_NUMBER);
-                                                                editTextCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
-                                                                editTextCode.setHint("קוד בעל 5 ספרות");
+                                                                editTextCode.setHint("הכנס קוד");
 
                                                                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                                                                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -266,10 +261,38 @@ public class MainActivity extends AppCompatActivity {
                                                                 dialog.show();
 
                                                             }else{
-                                                                Guard newuser = new Guard(account.getDisplayName(),"Guard");
-                                                                refGuards.child(account.getUid()).setValue(newuser);
-                                                                Toast.makeText(MainActivity.this,"google account is now set as guard",Toast.LENGTH_SHORT).show();
-                                                                startActivity(siGuard);
+
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                builder.setTitle("הכנס קוד");
+
+                                                                EditText editTextCode = new EditText(MainActivity.this);
+                                                                editTextCode.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                                editTextCode.setHint("הכנס קוד");
+
+                                                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                                                                editTextCode.setLayoutParams(layoutParams);
+
+                                                                builder.setView(editTextCode);
+
+                                                                builder.setPositiveButton("אישור", (dialog, which) -> {
+                                                                    String enteredCode = editTextCode.getText().toString();
+                                                                    if (enteredCode.equals("54321")) {
+                                                                        Guard newuser = new Guard(account.getDisplayName(),"Guard");
+                                                                        refGuards.child(account.getUid()).setValue(newuser);
+                                                                        startActivity(siGuard);
+                                                                    } else {
+                                                                        Toast.makeText(MainActivity.this, "Invalid code", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                });
+
+                                                                builder.setNegativeButton("Cancel", null);
+
+                                                                AlertDialog dialog = builder.create();
+                                                                dialog.show();
+
                                                             }
                                                         }
                                                     });

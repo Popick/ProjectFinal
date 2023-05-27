@@ -7,6 +7,7 @@ import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
@@ -102,7 +103,7 @@ public class new_user2 extends AppCompatActivity {
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-
+//TODO: add camera support and add ratio cut
     private void uploadFile() {
         if (mImageUri != null) {
             StorageReference fileReference = StorageRef.child(currentUser.getUid()
@@ -121,7 +122,7 @@ public class new_user2 extends AppCompatActivity {
                                 }
                             }, 500);
 
-                            Toast.makeText(new_user2.this, "Upload successful", Toast.LENGTH_LONG).show();
+                            Toast.makeText(new_user2.this, "Upload successful", Toast.LENGTH_SHORT).show();
                             Upload upload = new Upload(taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
 //                            String uploadId = refStorage.push().getKey();
                             refStorage.child(currentUser.getUid()).setValue(upload);
@@ -152,6 +153,9 @@ public class new_user2 extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
     }
+//TODO: fix the group user override problem, teachers and students....
+    //TODO: make sure user input is checked
+
 
     public void go_to_new_user3(View view) {
 
@@ -165,20 +169,57 @@ public class new_user2 extends AppCompatActivity {
 //            }
         refGroups.orderByChild("groupName").equalTo(Helper.getGrade(newUser.getGrade())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String groupId = snapshot.getKey();
-                        refStudents.child(currentUser.getUid()).setValue(newUser);
-                        siNextSignUp.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        Helper.addToGroup(currentUser.getUid(), groupId, false);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshotGrade) {
+                if (dataSnapshotGrade.exists()) {
+                    for (DataSnapshot snapshotGrade : dataSnapshotGrade.getChildren()) {
+                        refGroups.orderByChild("groupName").equalTo(Helper.getGrade(newUser.getGrade()) + newUser.getaClass()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshotClass) {
+                                if (dataSnapshotClass.exists()) {
+                                    for (DataSnapshot snapshotClass : dataSnapshotClass.getChildren()) {
 
-                        startActivity(siNextSignUp);
+                                        refStudents.child(currentUser.getUid()).setValue(newUser);
+                                        siNextSignUp.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        Helper.addToGroup(currentUser.getUid(), snapshotGrade.getKey(), false);
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(new_user2.this);
+                                        builder.setCancelable(false);
+
+                                        ProgressBar progressBar = new ProgressBar(new_user2.this);
+                                        progressBar.setIndeterminate(true);
+
+                                        builder.setView(progressBar);
+
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
+
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Helper.addToGroup(currentUser.getUid(), snapshotClass.getKey(), false);
+                                                startActivity(siNextSignUp);
+                                            }
+                                        }, 2000); // 2000 milliseconds = 2 seconds
+                                    }
+
+                                } else {
+                                    Toast.makeText(new_user2.this, "לא נמצאה כיתה, צור קשר עם המורה", Toast.LENGTH_SHORT).show();
+                                    startActivity(siNextSignUp);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                // Handle error
+                            }
+                        });
                     }
                 } else {
-                    Toast.makeText(new_user2.this, "לא נמצאה כיתה, צור קשר עם המורה", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(new_user2.this, "לא נמצאה שכבה, צור קשר עם המורה", Toast.LENGTH_SHORT).show();
                     startActivity(siNextSignUp);
                 }
+
             }
 
             @Override

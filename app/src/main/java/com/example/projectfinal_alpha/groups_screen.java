@@ -1,6 +1,7 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refGroups;
+import static com.example.projectfinal_alpha.FBref.refTeachers;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -47,6 +48,8 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
     ListView groupsLV;
     ArrayList<String> groupIDs = new ArrayList<String>();
 
+    ArrayList<String> teacherGroups = new ArrayList<String>();
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,15 +83,29 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
         super.onStart();
         currentUser = mAuth.getCurrentUser();
 
-        loadGroups();
+
+        refTeachers.child(currentUser.getUid()).child("groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    teacherGroups = (ArrayList<String>) dataSnapshot.getValue();
+                }
+
+                loadGroups();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the operation
+            }
+        });
+
+
     }
 
 //    public void go_to_create_group(View view) {
 //        finish();
 //    }
-
-
-
 
 
     public void loadGroups() {
@@ -99,15 +116,20 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
                 ArrayList<String> items = new ArrayList<>();
                 groupIDs.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    // Get the name of each item and add it to the list
-                    Group tmpGroup = snapshot.getValue(Group.class);
-                    items.add(tmpGroup.getGroupName());
-                    groupIDs.add(snapshot.getKey());
+                    if (teacherGroups.contains(snapshot.getKey())) {
+                        // Get the name of each item and add it to the list
+                        Group tmpGroup = snapshot.getValue(Group.class);
+                        items.add(tmpGroup.getGroupName());
+                        groupIDs.add(snapshot.getKey());
+                    }
                 }
 
                 // Set up an ArrayAdapter to display the list of items in a ListView
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
-                groupsLV.setAdapter(adapter);
+                if (getContext() != null) {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
+                    groupsLV.setAdapter(adapter);
+                }
+
             }
 
             @Override

@@ -113,27 +113,7 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
         }
     }
 
-    public void go_to_activity_guard(View view) {
-        Guard newuser = new Guard(currentUser.getDisplayName(), "Guard");
-        refGuards.child(currentUser.getUid()).setValue(newuser);
-        Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-        finish();
-    }
 
-    public void go_to_activity_teacher(View view) {
-        if (studentGrade == -1 || studentClass == -1) {
-
-            Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
-
-        } else {
-            Teacher newuser = new Teacher(currentUser.getDisplayName(), "Teacher", "0");
-            refTeachers.child(currentUser.getUid()).setValue(newuser);
-            Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-
-    }
 
     public void go_to_new_user2(View view) {
         if (check_input()) {

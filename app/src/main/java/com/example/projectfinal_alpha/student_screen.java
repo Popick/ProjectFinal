@@ -409,8 +409,6 @@ public class student_screen extends AppCompatActivity {
             iVQrCode.setVisibility(View.GONE);
 //            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + currentUser.getUid() + ".jpg?alt=media").into(iVQrCode);
 //            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".png?alt=media").into(iVQrCode);
-
-
         }
         status_tv.setVisibility(View.VISIBLE);
 //        tVStatusBtn.setVisibility(View.VISIBLE);

@@ -1,6 +1,7 @@
 package com.example.projectfinal_alpha;
 
 import static com.example.projectfinal_alpha.FBref.refGroups;
+import static com.example.projectfinal_alpha.FBref.refTeachers;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,14 +39,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Random;
 
-public class teacher_homescreen extends AppCompatActivity {
+public class teacher_homescreen extends AppCompatActivity  {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     private ActivityTeacherHomescreenBinding binding;
     private AppBarLayout toolbar;
     private FirebaseUser currentUser;
+
+    public static Teacher currentTeacher;
+    public static ArrayList<String> teacherStudentsIds = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +59,8 @@ public class teacher_homescreen extends AppCompatActivity {
         binding = ActivityTeacherHomescreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = binding.viewPager;
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = binding.tabs;
-        tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = binding.fab;
 
+        FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,11 +73,14 @@ public class teacher_homescreen extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
-        TabLayout.Tab thirdTab = tabLayout.getTabAt(2);
-        if (thirdTab != null) {
-            thirdTab.select();
-        }
+
+
+
+
+
+
+
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -84,41 +88,70 @@ public class teacher_homescreen extends AppCompatActivity {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-    }
-    public void onStart() {
-        super.onStart();
         currentUser = mAuth.getCurrentUser();
 
-    }
-    public void writeGroup(String groupName) {
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder(5);
-        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-        for (int i = 0; i < 5; i++) {
-            sb.append(characters.charAt(random.nextInt(characters.length())));
-        }
-        String joinCode = sb.toString();
-
-        refGroups.orderByChild("joinCode").equalTo(joinCode).addListenerForSingleValueEvent(new ValueEventListener() {
+        refTeachers.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    writeGroup(groupName);
-                } else {
-                    Group newGroup = new Group(currentUser.getDisplayName(), currentUser.getUid(), groupName, joinCode, false);
-                    refGroups.push().setValue(newGroup);
+                    currentTeacher = (Teacher) dataSnapshot.getValue(Teacher.class);
+
+                    for (String groupId : currentTeacher.getGroups()) {
+                        refGroups.child(groupId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    Group currentGroup = (Group) dataSnapshot.getValue(Group.class);
+                                    teacherStudentsIds.clear();
+                                    if (currentGroup.getStudentsIDs() != null) {
+                                        for (String studentId : currentGroup.getStudentsIDs()) {
+                                            if (!teacherStudentsIds.contains(studentId)) {
+                                                teacherStudentsIds.add(studentId);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(teacher_homescreen.this, getSupportFragmentManager());
+                                ViewPager viewPager = binding.viewPager;
+                                viewPager.setAdapter(sectionsPagerAdapter);
+                                TabLayout tabs = binding.tabs;
+                                tabs.setupWithViewPager(viewPager);
+                                TabLayout tabLayout = findViewById(R.id.tabs);
+                                TabLayout.Tab thirdTab = tabLayout.getTabAt(2);
+                                if (thirdTab != null) {
+                                    thirdTab.select();
+                                }
+                                Log.d("homescreenwork", "teacherStudentsIds: " + teacherStudentsIds.toString());
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                // Handle any errors that may occur during the operation
+                            }
+                        });
+
+                    }
+
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Handle error
+                // Handle any errors that may occur during the operation
             }
         });
 
+    }
+
+
+    public void onStart() {
+        super.onStart();
+
+
 
     }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add, menu);
@@ -162,7 +195,7 @@ public class teacher_homescreen extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String groupName = input.getText().toString();
-                    writeGroup(groupName);
+                    Helper.writeGroup(groupName, currentUser);
 
                     // Do something with the short name
                 }
@@ -182,6 +215,9 @@ public class teacher_homescreen extends AppCompatActivity {
 
         return true;
     }
+
+
+
 
 
 }
