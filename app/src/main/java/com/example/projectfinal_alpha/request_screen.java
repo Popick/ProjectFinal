@@ -32,6 +32,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * This class is the request screen of the app.
+ */
 public class request_screen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     ArrayList<String> teacherIDs = new ArrayList<String>();
     GoogleSignInClient mGoogleSignInClient;
@@ -42,7 +45,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
     Spinner hour;
     int selectedDay, selectedHour;
     CheckBox repeat;
-    Boolean isSpecific;
+    boolean isSpecific;
 
     boolean isTemp = true;
 
@@ -78,6 +81,12 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         radio_clicked_now(null);
     }
 
+    /**
+     * when the user want to send the request it checks the input and create a request object to
+     * send to the database.
+     *
+     * @param view
+     */
     public void send_request(View view) {
         if (reason.getText().toString().isEmpty()) {
             reason.setError("אנא ציין סיבה");
@@ -111,7 +120,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
                                     selectedDay, hours, true, false);
                         } else {
                             hours.add(selectedHour);
-                            hours.add(selectedHour+1);
+                            hours.add(selectedHour + 1);
                             currentRequest = new Request(currentUser.getUid(),
                                     timeNow, reason.getText().toString(), isTemp,
                                     selectedDay, hours, true, false);
@@ -120,7 +129,9 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
                         Calendar calendar = Calendar.getInstance();
                         int currentHour = Helper.getClassNumber(Helper.getCurrentDateString());
                         hours.add(currentHour);
-                        if (currentHour != 6 && currentHour != -1 ){hours.add(Helper.getClassNumber(Helper.getCurrentDateString())+1);}
+                        if (currentHour != 6 && currentHour != -1) {
+                            hours.add(Helper.getClassNumber(Helper.getCurrentDateString()) + 1);
+                        }
                         currentRequest = new Request(currentUser.getUid(),
                                 timeNow, reason.getText().toString(), true,
                                 calendar.get(Calendar.DAY_OF_WEEK), hours, true, false);
@@ -149,15 +160,13 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         }
     }
 
-//
-//
-//
-//
-//
-//
-//
 
 
+    /**
+     * this function is called when the user want to set the request to be now.
+     *
+     * @param view
+     */
     public void radio_clicked_now(View view) {
         isSpecific = false;
         day.setEnabled(false);
@@ -166,6 +175,11 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         repeat.setChecked(false);
     }
 
+    /**
+     * this function is called when the user want to set the request to be specific.
+     *
+     * @param view
+     */
     public void radio_clicked_specific(View view) {
         isSpecific = true;
         day.setEnabled(true);
@@ -173,14 +187,15 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
         repeat.setEnabled(true);
 
 
-    }public void weeklyPressed(View view) {
-        isTemp=!isTemp;
     }
-
-
-
-
-
+    /**
+     * this function is called when the user want to set the request to be weekly.
+     *
+     * @param view
+     */
+    public void weeklyPressed(View view) {
+        isTemp = !isTemp;
+    }
 
 
     @Override
@@ -193,7 +208,7 @@ public class request_screen extends AppCompatActivity implements AdapterView.OnI
                 selectedHour = 1;
             } else if (i == 2) {
                 selectedHour = 3;
-            }else if (i == 3) {
+            } else if (i == 3) {
                 selectedHour = 5;
             }
         }

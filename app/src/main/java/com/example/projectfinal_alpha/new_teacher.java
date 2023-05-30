@@ -104,10 +104,15 @@ public class new_teacher extends AppCompatActivity implements AdapterView.OnItem
         currentUser = mAuth.getCurrentUser();
     }
 
-
+    /**
+     * the function checks the input if the input is valid the
+     * function will create a new teacher according to the input of the user
+     * the function will also create a new group if the teacher is a class teacher or a grade teacher
+     * @param view
+     */
     public void go_to_new_teacher(View view) {
         Log.d("Tinfo", "class: " + teacherClass + " grade: " + teacherGrade + " type: " + teacherType);
-        if (teacherClass == -1 || teacherGrade == -1 || teacherType == -1) {
+        if ((teacherClass == -1 || teacherGrade == -1 || teacherType == -1) && teacherType != 1) {
             Toast.makeText(this, "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
         } else {
             if (teacherType == 1) {
@@ -197,6 +202,11 @@ public class new_teacher extends AppCompatActivity implements AdapterView.OnItem
     }
 
 
+    /**
+     * the function is called when the user clicks on the back button
+     * the function will return to the main activity
+     * @param view
+     */
     public void go_to_main_activity(View view) {
         finish();
     }

@@ -1,8 +1,8 @@
 package com.example.projectfinal_alpha;
 
 public class Guard {
-    private String Name;
-    private String userType;
+    String Name;
+    String userType;
 
     public Guard() {
     }

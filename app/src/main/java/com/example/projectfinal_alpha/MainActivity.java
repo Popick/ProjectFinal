@@ -53,7 +53,9 @@ import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
- * @author Etay Sabag <itay45520@gmail.com>
+ * The MainActivity class is the main entry point of the application. It handles user authentication
+ * using Google Sign-In and redirects users to different screens based on their user type (student, teacher, or guard).
+ *
  * @version 1.0
  * @since 15/10/2022
  */
@@ -69,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
 //TODO: FIX THE SCREEN FOR REGISTERED USERS, OR MAYBE JUST BLOCK ACCESS FROM GOING BACK
 
-
+    /**
+     * This method is called when the activity is starting or resuming. It checks if the user is already signed in
+     * and updates the UI accordingly.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method handles the sign-in process using Google Sign-In. It starts the sign-in intent and waits for
+     * the result in the onActivityResult method.
+     */
     public void onStart() {
         super.onStart();
 //        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -121,13 +130,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * This method handles the sign-in process using Google Sign-In. It starts the sign-in intent and waits for
+     * the result in the onActivityResult method.
+     */
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
 
     }
 
-
+    /**
+     * This method is called when the sign-in activity returns a result. It handles the result and authenticates
+     * the user with Firebase if the sign-in was successful.
+     *
+     * @param requestCode The request code passed to startActivityForResult().
+     * @param resultCode  The result code returned by the child activity.
+     * @param data        The intent data returned by the child activity.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -143,6 +163,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method handles the sign-in result from Google Sign-In. It authenticates the user with Firebase
+     * using the ID token obtained from Google Sign-In.
+     *
+     * @param completedTask The completed sign-in task containing the GoogleSignInAccount.
+     */
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
@@ -182,14 +208,18 @@ public class MainActivity extends AppCompatActivity {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("Error", "signInResult:failed code=" + e.getStatusCode());
-            updateUInull();
+            Toast.makeText(MainActivity.this, "Error occurred, please contact admin", Toast.LENGTH_SHORT).show();
         }
     }
 
-    //    public void updateUI(GoogleSignInAccount account){
-//        if (account != null) {
-//            tvtest.setText(account.getEmail());
-//        }}
+    /**
+     * This method updates the UI based on the user's authentication status. It checks the user's email
+     * domain to determine the user type (student, teacher, or guard) and redirects the user to the
+     * appropriate screen. If the user is not registered, it prompts the user to choose a user type
+     * and enter a code for teacher or guard registration.
+     *
+     * @param account The FirebaseUser object representing the authenticated user.
+     */
     public void updateUI(FirebaseUser account) {
         if (account != null) {
 //            if (account.getEmail().contains("@bs.amalnet.k12.il") || account.getEmail().contains("@amalnet.k12.il")){
@@ -337,22 +367,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateUInull() {
-        Toast.makeText(MainActivity.this, "Error occurred, please contact admin", Toast.LENGTH_SHORT).show();
-    }
 
 
-    public void go_to_activity_student(View view) {
-    }
-
-
-    public void go_to_activity_guard(View view) {
-    }
-
-    public void go_to_activity_teacher(View view) {
-        startActivity(siTeacher);
-
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

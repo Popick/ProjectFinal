@@ -53,10 +53,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * This class is the history screen of the app.
+ * It shows the history of the approvals the teacher has approved.
+ */
 public class history_screen extends Fragment implements AdapterView.OnItemClickListener {
-    ImageView pfp;
-    TextView name, email, id;
-    Button signout;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
@@ -76,11 +77,6 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     private Query query;
     private boolean validSelected = true, permanentSelected = true, temporarySelected = true;
 
-    /**
-     * @author Etay Sabag <itay45520@gmail.com>
-     * @version 1.0
-     * @since 29/12/2022
-     */
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -127,7 +123,10 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
             }
         });
 
-
+        /**
+         * This method is called when the filter button is clicked.
+         * It opens a dialog with filter options.
+         */
         filterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,57 +171,13 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_history_screen);
-//
-//        approvalsListView = (ListView) findViewById(R.id.requests_list_view);
-//        approvalsListView.setOnItemClickListener(this);
-////        pfp = (ImageView) findViewById(R.id.pfp);
-////        name = (TextView) findViewById(R.id.name);
-////        email = (TextView) findViewById(R.id.mail);
-////        id = (TextView) findViewById(R.id.id);
-////        signout = (Button) findViewById(R.id.singout);
-//
-//        mAuth = FirebaseAuth.getInstance();
-//
-//
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestEmail()
-//                .build();
-//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-//
-//
-////        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-////        if(acct != null)
-////        {
-////            String personName = acct.getDisplayName();
-////            String personGivenName = acct.getGivenName();
-////            String personFamilyName = acct.getFamilyName();
-////            String personEmail = acct.getEmail();
-////            String personId = acct.getId();
-////            Uri personPhoto = acct.getPhotoUrl();
-////            Glide.with(this).load(String.valueOf(personPhoto)).into(pfp);
-////            name.setText(personName);
-////            email.setText(personEmail);
-////            id.setText(personId);
-////
-////
-////
-////        }
-//    }
 
     public void onStart() {
         super.onStart();
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
         currentUser = mAuth.getCurrentUser();
         waitForRequest();
-//        Glide.with(this).load(String.valueOf(currentUser.getPhotoUrl())).into(pfp);
-//        name.setText(currentUser.getDisplayName());
-//        email.setText(currentUser.getEmail());
-//        id.setText(currentUser.getUid());
+
 
     }
 
@@ -234,7 +189,9 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
     }
 
-
+    /**
+     * Waits for approval requests and updates the UI with the received requests.
+     */
     public void waitForRequest() {
         Query query = refApprovals.orderByChild("timeStampApproval");
 
@@ -242,11 +199,7 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
         incomingRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dS) {
-//                approvalsID.clear();
-//                approvals.clear();
-//                studentsAndGroupsNames.clear();
-//                approvalsHeadLine.clear();
-//                timeArray.clear();
+
                 studentsApprovalsID.clear();
                 studentsApprovalsHeadLine.clear();
                 studentsApprovals.clear();
@@ -281,16 +234,12 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        // This method is called once with the initial value.
                                         if (dataSnapshot.exists()) {
                                             Student stuTemp = dataSnapshot.getValue(Student.class);
                                             stuTempName = stuTemp.getName();
 
                                             stuTempGrade = Helper.getGrade(stuTemp.getGrade());
                                             stuTempClass = stuTemp.getaClass();
-
-//                                timeArray.add(appTemp.getTimeStampApproval());
-//                                Collections.sort(timeArray, Collections.reverseOrder());
                                             time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
 
 
@@ -306,7 +255,6 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
 
                                     @Override
                                     public void onCancelled(DatabaseError error) {
-                                        // Failed to read value
                                         Log.w("failed", "Failed to read value.", error.toException());
 
                                     }
@@ -325,7 +273,6 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                             String grpTempName = "error";
                             String grpTempTeacher = "error";
                             int grpIndex = 0;
-                            //                            String grpTempClass = "error";
                             String time = "00:00";
 
                             @Override
@@ -335,15 +282,8 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
                                 if (currentTeacher.getGroups().contains(dataSnapshot.getKey())) {
                                     if (grpTemp != null) {
                                         grpTempName = grpTemp.getGroupName();
-
                                         grpTempTeacher = grpTemp.getTeacherName();
-//                                stuTempClass = stuTemp.getaClass();
-
-//                                    timeArray.add(appTemp.getTimeStampApproval());
-//                                    Collections.sort(timeArray, Collections.reverseOrder());
-
                                         time = Helper.stringToDateTime(appTemp.getTimeStampApproval());
-
                                         groupsNames.add(0, "הקבוצה " + grpTemp.getGroupName());
                                         groupsApprovalsHeadLine.add(0, "הקבוצה  " + grpTempName + " - " + grpTempTeacher + "      " + time);
 
@@ -388,30 +328,15 @@ public class history_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main, menu);
-//
-//        return true;
-//    }
-//
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        String st = item.getTitle().toString();
-//        if (st.equals("Logout")) {
-//            mGoogleSignInClient.signOut()
-//                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            FirebaseAuth.getInstance().signOut();
-//                            Toast.makeText(history_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-//                            finish();
-//                        }
-//                    });
-//
-//        }
-//
-//        return true;
-//    }
 
+    /**
+     * This method is called when the user clicks on an item in the list
+     * It opens a dialog with the approval details
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (isStudentsSelected) {

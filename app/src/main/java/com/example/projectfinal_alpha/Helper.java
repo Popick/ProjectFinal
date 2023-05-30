@@ -20,8 +20,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Random;
 
+/**
+ * The Helper class provides utility methods for date and time operations, as well as other helper functions.
+ */
 public class Helper {
-
+    /**
+     * Returns the current date and time as a string in the format "yyyyMMddHHmm".
+     *
+     * @return The current date and time as a string.
+     */
     public static String getCurrentDateString() {
         // Get the current date and time
         Date date = new Date();
@@ -31,6 +38,11 @@ public class Helper {
         return dateFormat.format(date);
     }
 
+    /**
+     * Returns the date and time for the next month from the current date and time, as a string in the format "yyyyMMddHHmm".
+     *
+     * @return The next month's date and time as a string.
+     */
     public static String getNextMonthDateString() {
         // Get the current date and time
         Date date = new Date();
@@ -43,6 +55,11 @@ public class Helper {
         return dateFormat.format(c.getTime());
     }
 
+    /**
+     * Returns the date and time for the next week from the current date and time, as a string in the format "yyyyMMddHHmm".
+     *
+     * @return The next week's date and time as a string.
+     */
     public static String getNextWeekDateString() {
         // Get the current date and time
         Date date = new Date();
@@ -57,6 +74,12 @@ public class Helper {
         return dateFormat.format(c.getTime());
     }
 
+    /**
+     * Converts a date string in the format "yyyyMMddHHmm" to a full text representation in the format "dd/MM/yyyy HH:mm".
+     *
+     * @param dateString The date string to convert.
+     * @return The full text representation of the date and time.
+     */
     public static String stringToDateFull(String dateString) {
         // Parse the input string into a Date object
         DateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -72,6 +95,12 @@ public class Helper {
         return outputFormat.format(date);
     }
 
+    /**
+     * Converts a date string in the format "yyyyMMddHHmm" to a time representation in the format "HH:mm".
+     *
+     * @param dateString The date string to convert.
+     * @return The time representation of the date.
+     */
     public static String stringToDateTime(String dateString) {
         // Parse the input string into a Date object
         DateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -87,6 +116,12 @@ public class Helper {
         return outputFormat.format(date);
     }
 
+    /**
+     * Returns the class number based on the given date string in the format "yyyyMMddHHmm".
+     *
+     * @param dateString The date string to determine the class number.
+     * @return The class number (1-6) or -1 if the date string is invalid.
+     */
     public static int getClassNumber(String dateString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -117,6 +152,13 @@ public class Helper {
         }
     }
 
+
+    /**
+     * Converts a grade level (7-12) to its corresponding Hebrew representation.
+     *
+     * @param grade The grade level (7-12) to convert.
+     * @return The Hebrew representation of the grade, or "error" if the grade is invalid.
+     */
     public static String getGrade(String grade) {
 
         if (grade.equals("7")) {
@@ -141,11 +183,23 @@ public class Helper {
         }
     }
 
+    /**
+     * Returns the current day of the week as an integer (1-7).
+     *
+     * @return The current day of the week.
+     */
     public static int getDayOfWeekNow() {
         Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
+    /**
+     * Converts the given day of the week (1-7) to its corresponding Hebrew representation.
+     *
+     * @param dayOfWeek The day of the week (1-7) to convert.
+     * @return The Hebrew representation of the day of the week.
+     * @throws IllegalArgumentException If the day of the week is invalid.
+     */
     public static String getDayOfWeekInHebrew(int dayOfWeek) {
         switch (dayOfWeek) {
             case 1:
@@ -167,6 +221,12 @@ public class Helper {
         }
     }
 
+    /**
+     * Checks if the time difference between the current time and the given input date string is more than 30 minutes.
+     *
+     * @param inputDate The input date string in the format "yyyyMMddHHmm".
+     * @return {@code true} if the time difference is more than 30 minutes, {@code false} otherwise.
+     */
     public static boolean isMoreThan30Minutes(String inputDate) {
         try {
             // Parse the input date string into a Date object
@@ -192,6 +252,13 @@ public class Helper {
         }
     }
 
+    /**
+     * Adds the student with the given ID to the group with the given ID.
+     *
+     * @param stuID            The ID of the student to add.
+     * @param groupID          The ID of the group to add the student to.
+     * @param deleteFromWaiting {@code true} to delete the student from the waiting list if present, {@code false} otherwise.
+     */
     public static void addToGroup(String stuID, String groupID, boolean deleteFromWaiting) {
         refGroups.child(groupID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -254,6 +321,12 @@ public class Helper {
 
     }
 
+    /**
+     * Removes the student with the given ID from the group with the given ID.
+     *
+     * @param stuID   The ID of the student to remove.
+     * @param groupID The ID of the group to remove the student from.
+     */
     public static void removeFromGroup(String stuID, String groupID) {
         refGroups.child(groupID).child("studentsIDs").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -290,6 +363,12 @@ public class Helper {
 
     }
 
+    /**
+     * Writes a new group to the Firebase database.
+     *
+     * @param groupName   The name of the group.
+     * @param currentUser The FirebaseUser object representing the current user.
+     */
     public static void writeGroup(String groupName, FirebaseUser currentUser) {
         Random random = new Random();
         StringBuilder sb = new StringBuilder(5);
@@ -322,7 +401,6 @@ public class Helper {
                             refTeachers.child(currentUser.getUid()).child("groups").setValue(groups);
 
 
-
                         }
 
                         @Override
@@ -340,9 +418,14 @@ public class Helper {
             }
         });
 
-
     }
 
+    /**
+     * Deletes a group from the Firebase database.
+     *
+     * @param groupID   The ID of the group to delete.
+     * @param teacherID The ID of the teacher who owns the group.
+     */
     public static void deleteGroup(String groupID, String teacherID) {
         refGroups.child(groupID).removeValue();
 

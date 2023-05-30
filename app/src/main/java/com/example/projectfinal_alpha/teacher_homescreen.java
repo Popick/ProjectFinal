@@ -42,7 +42,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class teacher_homescreen extends AppCompatActivity  {
+/**
+ * This class is the teacher's home screen of the app.
+ * It shows the teacher's history, requests, and groups.
+ * The teacher can create a new approval.
+ */
+public class teacher_homescreen extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     private ActivityTeacherHomescreenBinding binding;
@@ -51,6 +56,8 @@ public class teacher_homescreen extends AppCompatActivity  {
 
     public static Teacher currentTeacher;
     public static ArrayList<String> teacherStudentsIds = new ArrayList<String>();
+    int selectedTabIndex = 2;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +81,6 @@ public class teacher_homescreen extends AppCompatActivity  {
         setSupportActionBar(toolbar);
 
 
-
-
-
-
-
-
-
-
         mAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -90,49 +89,80 @@ public class teacher_homescreen extends AppCompatActivity  {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         currentUser = mAuth.getCurrentUser();
 
+        tabLayout = findViewById(R.id.tabs);
+
+
+        loadTeacherData(2, true);
+
+
+    }
+
+
+    public void onStart() {
+        super.onStart();
+        loadTeacherData(tabLayout.getSelectedTabPosition(), false);
+    }
+
+    /**
+     * This method loads the teacher's data from the database.
+     * @param tabIndex The index of the tab that the teacher is currently on.
+     * @param isFirstLoad Whether this is the first time the teacher is loading the data.
+     */
+    public void loadTeacherData(int tabIndex, boolean isFirstLoad) {
         refTeachers.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     currentTeacher = (Teacher) dataSnapshot.getValue(Teacher.class);
-
-                    for (String groupId : currentTeacher.getGroups()) {
-                        refGroups.child(groupId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    Group currentGroup = (Group) dataSnapshot.getValue(Group.class);
-                                    teacherStudentsIds.clear();
-                                    if (currentGroup.getStudentsIDs() != null) {
-                                        for (String studentId : currentGroup.getStudentsIDs()) {
-                                            if (!teacherStudentsIds.contains(studentId)) {
-                                                teacherStudentsIds.add(studentId);
+                    if (currentTeacher.getGroups() != null) {
+                        teacherStudentsIds.clear();
+                        for (String groupId : currentTeacher.getGroups()) {
+                            refGroups.child(groupId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        Group currentGroup = (Group) dataSnapshot.getValue(Group.class);
+                                        if (currentGroup.getStudentsIDs() != null) {
+                                            for (String studentId : currentGroup.getStudentsIDs()) {
+                                                if (!teacherStudentsIds.contains(studentId)) {
+                                                    teacherStudentsIds.add(studentId);
+                                                }
                                             }
                                         }
                                     }
+                                    if (isFirstLoad) {
+                                        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(teacher_homescreen.this, getSupportFragmentManager());
+                                        ViewPager viewPager = binding.viewPager;
+                                        viewPager.setAdapter(sectionsPagerAdapter);
+                                        TabLayout tabs = binding.tabs;
+                                        tabs.setupWithViewPager(viewPager);
+                                        TabLayout.Tab thirdTab = tabLayout.getTabAt(tabIndex);
+                                        if (thirdTab != null) {
+                                            thirdTab.select();
+                                        }
+                                    }
+                                    Log.d("homescreenwork", "teacherStudentsIds homescreen: " + teacherStudentsIds.toString());
                                 }
 
-                                SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(teacher_homescreen.this, getSupportFragmentManager());
-                                ViewPager viewPager = binding.viewPager;
-                                viewPager.setAdapter(sectionsPagerAdapter);
-                                TabLayout tabs = binding.tabs;
-                                tabs.setupWithViewPager(viewPager);
-                                TabLayout tabLayout = findViewById(R.id.tabs);
-                                TabLayout.Tab thirdTab = tabLayout.getTabAt(2);
-                                if (thirdTab != null) {
-                                    thirdTab.select();
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    // Handle any errors that may occur during the operation
                                 }
-                                Log.d("homescreenwork", "teacherStudentsIds: " + teacherStudentsIds.toString());
-                            }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                // Handle any errors that may occur during the operation
-                            }
-                        });
-
+                        }
+                    } else if (isFirstLoad) {
+                        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(teacher_homescreen.this, getSupportFragmentManager());
+                        ViewPager viewPager = binding.viewPager;
+                        viewPager.setAdapter(sectionsPagerAdapter);
+                        TabLayout tabs = binding.tabs;
+                        tabs.setupWithViewPager(viewPager);
+                        TabLayout tabLayout = findViewById(R.id.tabs);
+                        TabLayout.Tab thirdTab = tabLayout.getTabAt(tabIndex);
+                        if (thirdTab != null) {
+                            thirdTab.select();
+                        }
                     }
-
                 }
             }
 
@@ -141,17 +171,7 @@ public class teacher_homescreen extends AppCompatActivity  {
                 // Handle any errors that may occur during the operation
             }
         });
-
     }
-
-
-    public void onStart() {
-        super.onStart();
-
-
-
-    }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add, menu);
@@ -161,6 +181,7 @@ public class teacher_homescreen extends AppCompatActivity  {
 
         return true;
     }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         String menuTitle = item.getTitle().toString();
@@ -196,7 +217,7 @@ public class teacher_homescreen extends AppCompatActivity  {
                 public void onClick(DialogInterface dialog, int which) {
                     String groupName = input.getText().toString();
                     Helper.writeGroup(groupName, currentUser);
-
+                    loadTeacherData(tabLayout.getSelectedTabPosition(), true);
                     // Do something with the short name
                 }
             });
@@ -215,9 +236,6 @@ public class teacher_homescreen extends AppCompatActivity  {
 
         return true;
     }
-
-
-
 
 
 }

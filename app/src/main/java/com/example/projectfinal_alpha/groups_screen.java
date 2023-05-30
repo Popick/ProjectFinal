@@ -39,6 +39,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * This class is the groups screen of the app.
+ * It shows the groups the teacher is in.
+ * The teacher can create a new group, or join an existing group.
+ */
 public class groups_screen extends Fragment implements AdapterView.OnItemClickListener {
 
     FirebaseAuth mAuth;
@@ -71,13 +76,10 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
         return rootView;
     }
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_groups_screen);
-//        mAuth = FirebaseAuth.getInstance();
-//
-//    }
+    /**
+     * This method is called when the activity is starting.
+     * It loads the groups the teacher is in.
+     */
 
     public void onStart() {
         super.onStart();
@@ -103,11 +105,13 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
 
     }
 
-//    public void go_to_create_group(View view) {
-//        finish();
-//    }
 
-
+    /**
+     * This method loads the groups the teacher is in.
+     * It loads the groups from the database and displays them in a list view.
+     * The teacher can click on a group to view it.
+     *  If the teacher is not in any groups, the list view will be empty.
+     */
     public void loadGroups() {
 
         refGroups.addValueEventListener(new ValueEventListener() {
@@ -140,7 +144,13 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
 
     }
 
-
+    /**
+     * This method is called when the teacher clicks on a group in the list view.
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         siSelectedGroup.putExtra("keyID", groupIDs.get(i));
@@ -148,62 +158,4 @@ public class groups_screen extends Fragment implements AdapterView.OnItemClickLi
     }
 
 
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.add, menu);
-//
-//        return true;
-//    }
-//
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        String menuTitle = item.getTitle().toString();
-//        if (menuTitle.equals("Logout")) {
-//            mGoogleSignInClient.signOut()
-//                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            FirebaseAuth.getInstance().signOut();
-//                            Toast.makeText(groups_screen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-//                            Intent siMainScreen = new Intent(groups_screen.this, MainActivity.class);
-//                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                            startActivity(siMainScreen);
-//                        }
-//                    });
-//
-//        } else if (menuTitle.equals("Join Class")) {
-//
-//
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//            builder.setTitle("הכנס שם לקבוצה");
-//
-//// Set up the input
-//            final EditText input = new EditText(getContext());
-//            input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
-//            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-//            builder.setView(input);
-//
-//// Set up the buttons
-//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    String groupName = input.getText().toString();
-//                    writeGroup(groupName);
-//
-//                    // Do something with the short name
-//                }
-//            });
-//            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    dialog.cancel();
-//                }
-//            });
-//
-//            AlertDialog dialog = builder.create();
-//            dialog.show();
-////        Intent intent = new Intent(groups_screen.this, group_create_screen.class);
-////        startActivity(intent);
-//        }
-//
-//        return true;
-//    }
 }

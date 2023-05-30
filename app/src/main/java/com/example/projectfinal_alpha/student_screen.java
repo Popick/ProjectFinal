@@ -48,6 +48,9 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * This activity displays information and functionality for the student user.
+ * It allows the student to view their approvals, request new approvals, and join groups.
+ *
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.2
  * @since 15/10/2022
@@ -101,6 +104,10 @@ public class student_screen extends AppCompatActivity {
         readStudent();
     }
 
+    /**
+     * Handles the visibility switch for the QR code image.
+     * @param view The view that was clicked.
+     */
     public void qr_visibility_switch(View view) {
         if (iVQrCode.getVisibility() == View.VISIBLE) {
             iVQrCode.setVisibility(View.GONE);
@@ -112,6 +119,10 @@ public class student_screen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates a QR code based on the given content.
+     * @param content The content to encode into the QR code.
+     */
     public void create_qr_code(String content) {
         QRCodeWriter writer = new QRCodeWriter();
         try {
@@ -133,17 +144,14 @@ public class student_screen extends AppCompatActivity {
 
     }
 
+    /**
+     * Reads the student data from the database.
+     * If the student has an approval, it will be displayed.
+     * it also checks if the student has any groups, and if so, it will check for approvals in those groups.
+     */
     public void readStudent() {
         Query queryStudent = refStudents.child(currentUser.getUid());
         usrListener = new ValueEventListener() {
-
-
-            /**
-             * This method will be called with a snapshot of the data at this location. It will also be called
-             * each time that data changes.
-             *
-             * @param dS The current data at the location
-             */
 
             @Override
             public void onDataChange(DataSnapshot dS) {
@@ -165,12 +173,6 @@ public class student_screen extends AppCompatActivity {
                                     Approval appTemp = dataSnapshot.getValue(Approval.class);
                                     if (appTemp != null) {
 //todo: now that i keep the groups in the user need to update the reading what groups the user in
-                                        Log.d("boolean", !Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval()) + " --> isMoreThan30Minutes");
-                                        Log.d("boolean", (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString()))) + " --> getClassNumber");
-                                        // האישור תקף לחצי שעה
-                                        // או האישור תקף למשך השיעור, כלומר אם השיעור הנוכחי שווה לשיעור באישור
-                                        // אם השיעור שווה ל-1 משמע האישור ניתן לאחר שעות הלימודים ולכן תקף תמיד כל עוד לא עברה חצי שעה
-                                        // לצורכי דיבוג בלבד, בפרודקשן אחרי שעות הלימודים לתלמיד תמיד יהיה מותר לצאת
 
                                         Log.d("caman2", "so??? " + Helper.getDayOfWeekNow() + "but is it equal? " + (appTemp.getDay() == Helper.getDayOfWeekNow()));
 
@@ -370,16 +372,20 @@ public class student_screen extends AppCompatActivity {
     }
 
 
-//    public void writeStudent(){
-//        Student me = new Student("Etay Sabag", "214881310", "12","5","Cyber","Physics","None","Student",null,true );
-//        refStudents.child(me.getID()).setValue(me);
-//    }
 
 
+    /**
+     * Sends a request to the request screen activity.
+     * @param view The view that was clicked.
+     */
     public void sendRequest(View view) {
         startActivity(siRequests);
     }
 
+    /**
+     * Fills the UI elements with the student's data.
+     * @param currentStudent The current student object.
+     */
     public void fillUI(Student currentStudent) {
         Log.d("diff", "the request btn");
         if (currentStudent.getLastRequest() == null || Helper.isMoreThan30Minutes(currentStudent.getLastRequest())) {
@@ -407,15 +413,16 @@ public class student_screen extends AppCompatActivity {
             tVStatusBtn.setVisibility(View.GONE);
             requestBtn.setVisibility(View.VISIBLE);
             iVQrCode.setVisibility(View.GONE);
-//            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + currentUser.getUid() + ".jpg?alt=media").into(iVQrCode);
-//            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F"+currentUser.getUid()+".png?alt=media").into(iVQrCode);
+
         }
         status_tv.setVisibility(View.VISIBLE);
-//        tVStatusBtn.setVisibility(View.VISIBLE);
 
     }
 
-
+    /**
+     * Joins a group by entering a join code.
+     * @param view The view that was clicked.
+     */
     public void joinGroup(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("הכנס קוד קבוצה");
@@ -464,7 +471,6 @@ public class student_screen extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Handle error
                     }
                 });
 
@@ -508,40 +514,6 @@ public class student_screen extends AppCompatActivity {
         return true;
     }
 
-//TODO: fix all Menus
-
-//    if (!isAllowed && currentStudent.getPermanentApprovalID() != null) {
-//        for (String perApprovalID : currentStudent.getPermanentApprovalID()) {
-//            refApprovals.child(perApprovalID).addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Approval appTemp = dataSnapshot.getValue(Approval.class);
-//                    if (appTemp != null) {
-//                        Log.d("is it valid?", appTemp.getExpirationDate());
-//
-//                        if (appTemp.getExpirationDate().compareTo(Helper.getCurrentDateString()) < 0) {
-//                            Log.d("is it valid?", "yeah it is?");
-//                            refStudents.child(currentUserID).child("permanentApprovalID").child(perApprovalID).setValue(null);
-//                        } else {
-//                            isAllowed = (((appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
-//                                    Helper.getClassNumber(Helper.getCurrentDateString()) != -1)));
-//                        }
-//                    } else {
-//                        isAllowed = false;
-//                    }
-//
-//                    if (isAllowed) {
-//                        fillUI(currentStudent);
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
-//        }
-//    }
 }
 
 

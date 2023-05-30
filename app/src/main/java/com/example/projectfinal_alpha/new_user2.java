@@ -38,6 +38,8 @@ import com.google.firebase.storage.UploadTask;
 
 
 /**
+ * This class represents the second screen of the sign up process.
+ *
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.0
  * @since 4/11/2022
@@ -79,13 +81,17 @@ public class new_user2 extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
     }
 
-
+    /**
+     * Opens a file chooser to select an image from the device's storage.
+     * The selected image will be used for further processing.
+     */
     private void openFileChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -103,17 +109,29 @@ public class new_user2 extends AppCompatActivity {
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-//TODO: add camera support and add ratio cut
+
+    //TODO: add camera support and add ratio cut
+
+    /**
+     * This method is called when the user clicks the "Choose file" button.
+     * The method opens a file chooser to select an image from the device's storage.
+     * after the user selects an image, the image is displayed in the image view
+     * and the image is uploaded to Firebase Storage.
+     *
+     */
     private void uploadFile() {
         if (mImageUri != null) {
+            // Create a StorageReference for the file
             StorageReference fileReference = StorageRef.child(currentUser.getUid()
                     + "." + getFileExtension(mImageUri));
             Log.d("where_saved", StorageRef.toString() + "   " + fileReference.toString() + "      " + fileReference.getFile(mImageUri));
 
+            // Upload the file to Firebase Storage
             UploadTask = fileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Delayed execution of resetting progress bar
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -122,51 +140,63 @@ public class new_user2 extends AppCompatActivity {
                                 }
                             }, 500);
 
+                            // Display success message
                             Toast.makeText(new_user2.this, "Upload successful", Toast.LENGTH_SHORT).show();
+
+                            // Create an Upload object with the download URL
                             Upload upload = new Upload(taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
-//                            String uploadId = refStorage.push().getKey();
+
+                            // Store the Upload object in Firebase Realtime Database
                             refStorage.child(currentUser.getUid()).setValue(upload);
+
+                            // Enable the next button
                             btnNext.setEnabled(true);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            // Display error message in case of failure
                             Toast.makeText(new_user2.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Update progress bar during the upload process
                             double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                             progressBarUpload.setProgress((int) progress);
                             btnNext.setEnabled(false);
                         }
                     });
         } else {
+            // Display message if no file was selected
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * this method sends the user to the previous screen.
+     *
+     * @param view
+     */
     public void go_to_new_user1(View view) {
         startActivity(siPrevSignUp);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
     }
-//TODO: fix the group user override problem, teachers and students....
+    //TODO: fix the group user override problem, teachers and students....
     //TODO: make sure user input is checked
 
-
+    /**
+     * this method finishes the sign up process and sends the user to the main screen.
+     * the method adds the user to the groups he belongs to.
+     *
+     * @param view
+     */
     public void go_to_new_user3(View view) {
 
 
-//        refGroups.orderByChild("groupName").equalTo(Helper.getGrade(newUser.getGrade())).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    Helper.addToGroup(currentUser.getUid(),dataSnapshot.getKey(), false);
-//                }
-//            }
         refGroups.orderByChild("groupName").equalTo(Helper.getGrade(newUser.getGrade())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshotGrade) {
@@ -236,6 +266,7 @@ public class new_user2 extends AppCompatActivity {
         super.finish();
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
+
 
     public void uploadImage(View view) {
         uploadFile();

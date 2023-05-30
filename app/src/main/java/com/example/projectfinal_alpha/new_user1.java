@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 
 /**
+ * This class is the first screen of the sign up process for the student.
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 2.0
  * @since 28/10/2022
@@ -102,19 +103,30 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
 
     }
 
+    /**
+     * this function is called when the user want to proceed to the next activity, it checks if
+     * input is valid.
+     *
+     * @return true if the input is valid, false otherwise
+     */
     public boolean check_input() {
         if (studentGrade == -1 || studentClass == -1) {
             Toast.makeText(this, "please select class and grade", Toast.LENGTH_SHORT).show();
             return false;
         } else {
-            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", null, null, null, null);
+            newUser = new Student(currentUser.getDisplayName(), studentGrade + "", studentClass + "", "Student", null, null, null);
             Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             return true;
         }
     }
 
 
-
+    /**
+     * this function is called when the user click on the button "next", it checks if
+     * input is valid and if so, it goes to the next activity.
+     *
+     * @param view
+     */
     public void go_to_new_user2(View view) {
         if (check_input()) {
             siNextSignUp.putExtra("userObject", newUser);

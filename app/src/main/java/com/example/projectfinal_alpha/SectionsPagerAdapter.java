@@ -23,11 +23,17 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2, R.string.tab_text_3};
     private final Context mContext;
 
+
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
     }
 
+    /**
+     * This method returns the fragment of the page requested.
+     * @param position
+     * @return
+     */
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
@@ -47,12 +53,21 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 //        return PlaceholderFragment.newInstance(position + 1);
     }
 
+    /**
+     * This method returns the title of the page requested.
+     * @param position The position of the title requested
+     * @return
+     */
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
         return mContext.getResources().getString(TAB_TITLES[position]);
     }
 
+    /**
+     * This method returns the number of pages in the screen.
+     * @return
+     */
     @Override
     public int getCount() {
         // Show 2 total pages.

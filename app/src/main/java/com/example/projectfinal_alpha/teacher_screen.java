@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
+ * This class is the teacher first screen of the app.
+ * It shows the teacher the requests he got from students.
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.0
  * @since 26/10/2022
@@ -97,32 +99,11 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_teacher_screen);
-//
-//        requestsListView = (ListView) findViewById(R.id.requests_list_view);
-//        requestsListView.setOnItemClickListener(this);
-////        pfp = (ImageView) findViewById(R.id.pfp);
-////        name = (TextView) findViewById(R.id.name);
-////        email = (TextView) findViewById(R.id.mail);
-////        id = (TextView) findViewById(R.id.id);
-////        signout = (Button) findViewById(R.id.singout);
-//
-//        mAuth = FirebaseAuth.getInstance();
-//
-//
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestEmail()
-//                .build();
-//        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
-//
-//
-////        ActionBar actionBar = getSupportActionBar();
-////        actionBar.setTitle(Html.fromHtml("<font color='#000000'><strong>Teacher</strong></font>"));
-//    }
-
+    /**
+     * this method is called on start of the activity.
+     * it gets the requests from the database and shows them to the teacher.
+     * it also gets the students that sent the requests.
+     */
     public void onStart() {
         super.onStart();
 //        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -211,6 +192,10 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
 
     }
 
+    /**
+     * this method is called when the activity is paused.
+     * it removes the listener from the database.
+     */
     public void onPause() {
         super.onPause();
         if (incomingRequestsListener != null) {
@@ -220,37 +205,18 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-    public void waitForRequest() {
 
 
-    }
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main, menu);
-
-        return true;
-    }
-
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        String st = item.getTitle().toString();
-//        if (st.equals("Logout")) {
-//            mGoogleSignInClient.signOut()
-//                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            FirebaseAuth.getInstance().signOut();
-//                            Toast.makeText(teacher_homescreen.this, "Signed out successfully!", Toast.LENGTH_SHORT).show();
-//                            Intent siMainScreen = new Intent(teacher_screen.this, MainActivity.class);
-//                            siMainScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                            startActivity(siMainScreen);
-//                        }
-//                    });
-//
-//        }
-//
-//        return true;
-//    }
+    /**
+     * this method is called when the teacher clicks on a request.
+     * it shows the teacher the request details and allows him to accept or decline the request.
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -369,7 +335,6 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
                             // Handle any errors that may occur during the operation
                         }
                     });
-//                    refStudents.child(selectedRequest.getStuID()).child("permanentApprovalID").child(tempKey).setValue(currentApprovalRef.getKey());
                 }
 
             }
@@ -389,19 +354,5 @@ public class teacher_screen extends Fragment implements AdapterView.OnItemClickL
     }
 
 
-//    public void go_to_create_approval(View view) {
-////        Intent intent = new Intent(teacher_screen.this, approval_create_screen.class);
-////        startActivity(intent);
-//
-//    }
-//
-//    public void go_to_history(View view) {
-////        Intent intent = new Intent(teacher_screen.this, history_screen.class);
-////        startActivity(intent);
-//    }
-//
-//    public void go_to_classes(View view) {
-////        Intent intent = new Intent(teacher_screen.this, groups_screen.class);
-////        startActivity(intent);
-//    }
+
 }

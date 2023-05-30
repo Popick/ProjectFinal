@@ -39,6 +39,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * Represents the group view activity.
+ */
 public class group_view extends AppCompatActivity implements AdapterView.OnItemClickListener {
     String groupID;
     TextView groupNameHeader;
@@ -89,6 +92,21 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
         });
 
 
+        loadGroup();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentUser = mAuth.getCurrentUser();
+    }
+
+
+    /**
+     * This method loads the group from the database.
+     */
+    public void loadGroup(){
         Query query = refGroups.child(groupID);
         incomingRequestsListener = new ValueEventListener() {
             @Override
@@ -170,21 +188,11 @@ public class group_view extends AppCompatActivity implements AdapterView.OnItemC
         };
 
         query.addValueEventListener(incomingRequestsListener);
-
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        currentUser = mAuth.getCurrentUser();
-        loadGroup();
-    }
-
-    public void loadGroup() {
-
-
-    }
-
+    /**
+     * Navigates to the add students screen.
+     */
     public void go_to_add_students(View view) {
         Intent siAddTo = new Intent(this, addto_group_screen.class);
         siAddTo.putExtra("keyID", groupID);

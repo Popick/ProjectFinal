@@ -3,9 +3,9 @@ package com.example.projectfinal_alpha;
 import java.util.ArrayList;
 
 public class Teacher {
-    private String name;
-    private String userType;
-    private ArrayList<String> groups;
+    String name;
+    String userType;
+    ArrayList<String> groups;
 
     public Teacher() {
     }

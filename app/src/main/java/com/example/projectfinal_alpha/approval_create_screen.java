@@ -35,6 +35,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Represents the approval creation screen.
+ */
 public class approval_create_screen extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     ArrayList<String> studentNames = new ArrayList<String>();
@@ -189,6 +192,9 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
     }
 
 
+    /**
+     * Loads the students into the list view.
+     */
     public void loadStudents(View view) {
         isStudentsSelected = true;
         refStudents.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -220,6 +226,10 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
         });
     }
 
+
+    /**
+     * Loads the groups into the list view.
+     */
     public void loadGroups(View view) {
         isStudentsSelected = false;
         refGroups.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -250,7 +260,9 @@ public class approval_create_screen extends AppCompatActivity implements SearchV
         });
     }
 
-
+    /**
+     * Handles the click event of the "Add students" button.
+     */
     public void add_students(View view) {
         finish();
     }

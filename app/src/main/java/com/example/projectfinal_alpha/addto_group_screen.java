@@ -27,6 +27,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+
+/**
+ * Represents the activity for adding students to a group.
+ */
 public class addto_group_screen extends AppCompatActivity implements SearchView.OnQueryTextListener {
     ArrayList<String> studentnames = new ArrayList<String>();
     ArrayList<String> studentIDs = new ArrayList<String>();
@@ -40,7 +44,10 @@ public class addto_group_screen extends AppCompatActivity implements SearchView.
     String groupID;
     ValueEventListener incomingRequestsListener;
 
-
+    /**
+     * Called when the activity is starting. Sets up the layout and initializes variables.
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,33 +128,19 @@ public class addto_group_screen extends AppCompatActivity implements SearchView.
                 builder.setPositiveButton("הוסף", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        allStudentIDs.add(studentIDs.get(studentnames.indexOf(parent.getItemAtPosition(position))));
                         addToGroup(studentIDs.get(studentnames.indexOf(parent.getItemAtPosition(position))),groupID, false);
-//                        refGroups.child(groupID).child("studentsIDs").setValue(allStudentIDs);
                         searchView.setQuery("", false);
                     }
                 });
                 builder.setNegativeButton("בטל", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Cancel code here
                     }
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
         });
-//        selectedStudents = new ArrayList<String>();
-//        SparseBooleanArray checked = listView.getCheckedItemPositions();
-//        for (int i = 0; i < checked.size(); i++) {
-//            int key = checked.keyAt(i);
-//            boolean value = checked.get(key);
-//            if (value) {
-//                String item = (String) adapter.getItem(position); // Retrieve the data based on the position in the displayed list
-//                Log.d("Selected item", item);
-//                selectedStudents.add(studentIDs.get(position)); // Retrieve the ID based on the position in the displayed list
-//            }
-//        }
     }
     @Override
     public boolean onQueryTextSubmit(String s) {
@@ -160,7 +153,9 @@ public class addto_group_screen extends AppCompatActivity implements SearchView.
         return false;
     }
 
-
+    /**
+     * Loads the student names into the ListView.
+     */
     public void loadStudents() {
         adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, studentnames);
         listView.setAdapter(adapter);
@@ -168,7 +163,9 @@ public class addto_group_screen extends AppCompatActivity implements SearchView.
 
 
 
-
+    /**
+     * Handles the click event of the "add_students" button .
+     */
     public void add_students(View view) {
         finish();
     }
