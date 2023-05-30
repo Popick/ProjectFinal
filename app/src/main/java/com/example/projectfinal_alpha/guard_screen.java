@@ -3,7 +3,6 @@ package com.example.projectfinal_alpha;
 import static com.example.projectfinal_alpha.FBref.refApprovals;
 import static com.example.projectfinal_alpha.FBref.refGroups;
 import static com.example.projectfinal_alpha.FBref.refStudents;
-import static com.example.projectfinal_alpha.FBref.refUsers;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,12 +12,12 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,33 +38,27 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.Result;
 import com.squareup.picasso.Picasso;
 
-import java.text.Format;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
-
 /**
+ * This class is the guard screen of the app.
+ * It shows the guard the student's details.
  * @author Etay Sabag <itay45520@gmail.com>
  * @version 1.0
  * @since 23/10/2022
  */
 public class guard_screen extends AppCompatActivity {
     private CodeScanner codeScanner;
-    TextView tv_result, tv_datetime;
+    TextView tv_result, tv_userName;
     CodeScannerView scannerView;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
-    FirebaseUser currentUser;
     ImageView iVQrCode;
     Student currentStudent;
     boolean isAllowedTemp = false;
     boolean isAllowedPer = false;
     boolean isAllowedGroup = false;
-    private boolean atLeastOneGroup;
-    private boolean atLeastOneTemp;
-    private boolean atLeastOnePer;
+    boolean atLeastOneGroup;
+    boolean atLeastOneTemp;
+    boolean atLeastOnePer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +70,7 @@ public class guard_screen extends AppCompatActivity {
         Toast.makeText(guard_screen.this, "לחץ על המסך בשביל לסרוק", Toast.LENGTH_LONG).show();
         scannerView = findViewById(R.id.scanner_view);
         tv_result = findViewById(R.id.tv_result);
-        tv_datetime = findViewById(R.id.tv_view_time);
+        tv_userName = findViewById(R.id.tv_view_name);
         iVQrCode = (ImageView) findViewById(R.id.iVQrCode);
 
 
@@ -95,10 +88,6 @@ public class guard_screen extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Format dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String dateTimeString = dateFormat.format(new Date());
-                        Toast.makeText(guard_screen.this, result.getText(), Toast.LENGTH_SHORT).show();
-                        tv_datetime.setText(dateTimeString);
                         loadUser(result.getText());
                     }
                 });
@@ -113,6 +102,11 @@ public class guard_screen extends AppCompatActivity {
         });
     }
 
+    /**
+     * this function is called after the guard scan the student's QR code.
+     * It loads the student's details and checks if he is allowed to leave the school.
+     * @param Uid the user id.
+     */
     public void loadUser(String Uid) {
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/project-final-ishorim.appspot.com/o/uploads%2F" + Uid + ".jpg?alt=media").into(iVQrCode);
         Log.d("camann", "fuck yes");
@@ -142,17 +136,12 @@ public class guard_screen extends AppCompatActivity {
 //todo: now that i keep the groups in the user need to update the reading what groups the user in
                                         Log.d("boolean", !Helper.isMoreThan30Minutes(appTemp.getTimeStampApproval()) + " --> isMoreThan30Minutes");
                                         Log.d("boolean", (appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString()))) + " --> getClassNumber");
-                                        // האישור תקף לחצי שעה
-                                        // או האישור תקף למשך השיעור, כלומר אם השיעור הנוכחי שווה לשיעור באישור
-                                        // אם השיעור שווה ל-1 משמע האישור ניתן לאחר שעות הלימודים ולכן תקף תמיד כל עוד לא עברה חצי שעה
-                                        // לצורכי דיבוג בלבד, בפרודקשן אחרי שעות הלימודים לתלמיד תמיד יהיה מותר לצאת
-
                                         Log.d("caman2", "so??? " + Helper.getDayOfWeekNow() + "but is it equal? " + (appTemp.getDay() == Helper.getDayOfWeekNow()));
 
 
                                         if (appTemp.getExpirationDate().compareTo(Helper.getCurrentDateString()) < 0) {
                                             currentStudent.getApprovalID().remove(approvalID);
-                                            refStudents.child(currentUser.getUid()).child("approvalID").setValue(currentStudent.getApprovalID());
+                                            refStudents.child(Uid).child("approvalID").setValue(currentStudent.getApprovalID());
                                             refApprovals.child(approvalID).child("isValid").setValue(false);
 
                                             isAllowedTemp = false;
@@ -213,7 +202,7 @@ public class guard_screen extends AppCompatActivity {
                                             Log.d("isitvalid?", "nope it isn't");
                                             Log.d("caman2", "so??? " + Helper.getDayOfWeekNow() + "but is it equal? " + (appTemp.getDay() == Helper.getDayOfWeekNow()));
                                             currentStudent.getPermanentApprovalID().remove(perApprovalID);
-                                            refStudents.child(currentUser.getUid()).child("permanentApprovalID").setValue(currentStudent.getPermanentApprovalID());
+                                            refStudents.child(Uid).child("permanentApprovalID").setValue(currentStudent.getPermanentApprovalID());
                                             refApprovals.child(perApprovalID).child("isValid").setValue(false);
 
                                             isAllowedPer = false;
@@ -323,7 +312,7 @@ public class guard_screen extends AppCompatActivity {
                             if (grpTemp.getStudentsIDs() != null) {
                                 Log.d("caman", "step 2 " + grpTemp.getStudentsIDs().toString());
 
-                                if (grpTemp.getStudentsIDs().contains(currentUser.getUid())) {
+                                if (grpTemp.getStudentsIDs().contains(Uid)) {
 
                                     //possible bug: maybe approval ID is never being set, check it if doesnt work
                                     Log.d("caman", "is it null? " + grpTemp.getApprovalID());
@@ -334,10 +323,6 @@ public class guard_screen extends AppCompatActivity {
 
                                                 Approval appTemp = dataSnapshot.getValue(Approval.class);
                                                 if (appTemp != null) {
-                                                    // האישור תקף לחצי שעה
-                                                    // או האישור תקף למשך השיעור, כלומר אם השיעור הנוכחי שווה לשיעור באישור
-                                                    // אם השיעור שווה ל-1 משמע האישור ניתן לאחר שעות הלימודים ולכן תקף תמיד כל עוד לא עברה חצי שעה
-                                                    // לצורכי דיבוג בלבד, בפרודקשן אחרי שעות הלימודים לתלמיד תמיד יהיה מותר לצאת
                                                     isAllowedGroup = ((appTemp.getHour().contains(Helper.getClassNumber(Helper.getCurrentDateString())) &&
                                                             Helper.getClassNumber(Helper.getCurrentDateString()) != -1) && appTemp.getDay() == Helper.getDayOfWeekNow());
 
@@ -390,13 +375,21 @@ public class guard_screen extends AppCompatActivity {
 
     }
 
+    /**
+     * shows the guard if the student is allowed to leave the school
+     */
     public void updateApproval() {
         if (atLeastOnePer || atLeastOneTemp || atLeastOneGroup) {
             tv_result.setText("יש אישור");
+            tv_result.setTextColor(Color.GREEN);
+
         } else {
             tv_result.setText("אין אישור");
+            tv_result.setTextColor(Color.RED);
         }
+        tv_userName.setText(currentStudent.getName());
     }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

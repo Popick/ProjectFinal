@@ -10,31 +10,26 @@ import java.util.ArrayList;
  * Constants for the users' table in the data base
  */
 public class Student implements Serializable {
-    private String name;
-    private String grade;
-    private String aClass;
-    private String userType;
-    private ArrayList<String> groups;
-    private String QR_data;
-    private ArrayList<String> approvalID;
-    private String lastRequest;
-
-    private  ArrayList<String> permanentApprovalID;
-
-
-
+    String name;
+    String grade;
+    String aClass;
+    String userType;
+    ArrayList<String> groups;
+    String QR_data;
+    ArrayList<String> approvalID;
+    String lastRequest;
+    ArrayList<String> permanentApprovalID;
     public boolean isAllowed = false;
 
     public Student() {
     }
 
-    public Student(String name, String grade, String aClass, String userType, ArrayList<String> groups, String QR_data, ArrayList<String> approvalID,  ArrayList<String> permanentApprovalID) {
+    public Student(String name, String grade, String aClass, String userType, ArrayList<String> groups, ArrayList<String> approvalID,  ArrayList<String> permanentApprovalID) {
         this.name = name;
         this.grade = grade;
         this.aClass = aClass;
         this.userType = userType;
         this.groups = groups;
-        this.QR_data = QR_data;
         this.approvalID = approvalID;
         this.permanentApprovalID = permanentApprovalID;
     }
@@ -72,14 +67,6 @@ public class Student implements Serializable {
     }
 
 
-
-    public String getQR_data() {
-        return QR_data;
-    }
-
-    public void setQR_data(String QR_data) {
-        this.QR_data = QR_data;
-    }
 
     public ArrayList<String> getApprovalID() {
         return approvalID;

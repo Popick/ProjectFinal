@@ -39,13 +39,10 @@ public class new_user1 extends AppCompatActivity implements AdapterView.OnItemSe
     String[] grades = {"", "ז", "ח", "ט", "י", "יא", "יב"};
     int[] gradesnums = {0, 7, 8, 9, 10, 11, 12};
     String[] classes = {"", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-//    String[] groupA = {"", "פסיכולוגיה", "אומנות", "כימיה", "תקשורת", "מחשבים", "אלקטרוניקה", "הנדסת בניין", "לאי", "מדח", "מחשבת ישראל"};
-//    String[] groupB = {"", "פיסיקה", "ביוטכנולוגיה", "ביולוגיה"};
+
     int studentGrade = -1;
     int studentClass = -1;
-    //    ArrayList<Integer> groups = new ArrayList<Integer>();
-//    String studentGroupA;
-//    String studentGroupB;
+
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;

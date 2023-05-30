@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Request {
-
-
     String stuID;
     String requestID;
     String timeStampRequest;

@@ -2,6 +2,9 @@ package com.example.projectfinal_alpha;
 
 import java.util.ArrayList;
 
+/**
+ * Represents a group.
+ */
 public class Group {
     String TeacherName;
     String teacherID;
@@ -10,13 +13,24 @@ public class Group {
     String approvalID;
     String groupName;
     String joinCode;
-
     boolean canLeave;
     String key_id;
 
+    /**
+     * Default constructor for the Group class.
+     */
     public Group() {
     }
-//bruh what
+
+    /**
+     * Constructor for the Group class.
+     *
+     * @param teacherName The name of the teacher.
+     * @param teacherID   The ID of the teacher.
+     * @param groupName   The name of the group.
+     * @param joinCode    The join code for the group.
+     * @param canLeave    Indicates whether students can leave the group.
+     */
     public Group(String teacherName, String teacherID, String groupName, String joinCode, boolean canLeave) {
         TeacherName = teacherName;
         this.teacherID = teacherID;

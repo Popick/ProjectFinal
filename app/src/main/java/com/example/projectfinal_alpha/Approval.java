@@ -2,6 +2,9 @@ package com.example.projectfinal_alpha;
 
 import java.util.ArrayList;
 
+/**
+ * Represents an approval object.
+ */
 public class Approval {
     String timeStampApproval;
     String expirationDate;
@@ -12,11 +15,25 @@ public class Approval {
     String studentsID;
     String groupsID;
     String requestID;
-    Boolean isValid;
-    Boolean isPermanent;
+    boolean isValid;
+    boolean isPermanent;
 
-
-    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, String studentsID, String groupsID, String requestID, String expirationDate, Boolean isValid, Boolean isPermanent)  {
+    /**
+     * Constructs an Approval object with the provided data.
+     *
+     * @param timeStampApproval The timestamp of the approval.
+     * @param teAnswer          The answer for the teacher.
+     * @param teAnswerID        The ID of the teacher's answer.
+     * @param day               The day of the approval.
+     * @param hour              The hours of the approval.
+     * @param studentsID        The ID of the student.
+     * @param groupsID          The ID of the group.
+     * @param requestID         The ID of the request.
+     * @param expirationDate    The expiration date of the approval.
+     * @param isValid           Indicates if the approval is valid.
+     * @param isPermanent       Indicates if the approval is permanent.
+     */
+    public Approval(String timeStampApproval, String teAnswer, String teAnswerID, int day, ArrayList<Integer> hour, String studentsID, String groupsID, String requestID, String expirationDate, boolean isValid, boolean isPermanent)  {
         this.timeStampApproval = timeStampApproval;
         this.teAnswer = teAnswer;
         this.teAnswerID = teAnswerID;
@@ -104,19 +121,19 @@ public class Approval {
         this.expirationDate = expirationDate;
     }
 
-    public Boolean isValid() {
+    public boolean isValid() {
         return isValid;
     }
 
-    public void setValid(Boolean valid) {
+    public void setValid(boolean valid) {
         isValid = valid;
     }
 
-    public Boolean isPermanent() {
+    public boolean isPermanent() {
         return isPermanent;
     }
 
-    public void setPermanent(Boolean permanent) {
+    public void setPermanent(boolean permanent) {
         isPermanent = permanent;
     }
 }
